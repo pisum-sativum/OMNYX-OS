@@ -9,9 +9,8 @@ if (!process.env.ANTHROPIC_API_KEY) {
 }
 
 const server = Fastify({
-  logger: {
-    level: process.env.NODE_ENV === 'production' ? 'warn' : 'info',
-  },
+  logger: { level: process.env.NODE_ENV === 'production' ? 'warn' : 'info' },
+  bodyLimit: 8192,
 });
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? '').split(',').map(s => s.trim()).filter(Boolean);

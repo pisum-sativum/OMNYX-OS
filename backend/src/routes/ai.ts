@@ -1,12 +1,15 @@
 import { FastifyInstance } from 'fastify';
 import { AnalyzeRequestSchema } from '../validators/aiSchemas';
 import { rateLimitMiddleware } from '../middleware/rateLimit';
+import { validateMiddleware } from '../middleware/validate';
 import { analyzeThreaat } from '../services/llm';
 import { randomUUID } from 'crypto';
 
 export async function aiRoutes(fastify: FastifyInstance) {
   fastify.post('/api/ai/analyze', async (req, reply) => {
-    // Parse and validate input
+    await validateMiddleware(req, reply);
+    if (reply.sent) return;
+
     const parseResult = AnalyzeRequestSchema.safeParse(req.body);
     if (!parseResult.success) {
       return reply.code(400).send({
@@ -17,10 +20,9 @@ export async function aiRoutes(fastify: FastifyInstance) {
     }
 
     const validatedBody = parseResult.data;
-
-    // Apply rate limiting
-    const typedReq = req as typeof req & { body: { deviceId?: string } };
+    const typedReq = req as typeof req & { body: typeof validatedBody };
     typedReq.body = validatedBody;
+
     await rateLimitMiddleware(typedReq, reply);
     if (reply.sent) return;
 
@@ -42,6 +44,5 @@ export async function aiRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // Health check
   fastify.get('/health', async () => ({ status: 'operational', version: '1.0.0' }));
 }
