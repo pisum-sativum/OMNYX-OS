@@ -1,0 +1,21 @@
+{
+  "name": "omnyx-ai-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.54.0",
+    "@fastify/cors": "^10.0.0",
+    "fastify": "^5.4.0",
+    "zod": "^3.23.8",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "@types/node": "^22.0.0",
+    "ts-node-dev": "^2.0.0"
+  }
+}
