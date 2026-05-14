@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { AnalyzeRequestSchema } from '../validators/aiSchemas';
 import { rateLimitMiddleware } from '../middleware/rateLimit';
-import { analyzeThreaat } from '../services/claude';
+import { analyzeThreaat } from '../services/llm';
 import { randomUUID } from 'crypto';
 
 export async function aiRoutes(fastify: FastifyInstance) {
