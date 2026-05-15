@@ -47,7 +47,7 @@ const MODES: ModeDefinition[] = [
     Icon: EyeOff,
     color: '#00CCFF',
     description: 'Full tracking suppression',
-    tags: ['Location off', 'Mic blocked'],
+    tags: ['Location alerts on', 'Mic apps flagged'],
   },
   {
     id: 'banking',
@@ -55,7 +55,7 @@ const MODES: ModeDefinition[] = [
     Icon: Lock,
     color: '#00DD77',
     description: 'Financial transaction guard',
-    tags: ['Clipboard locked', 'Net isolated'],
+    tags: ['Clipboard risks tracked', 'Net risks surfaced'],
   },
   {
     id: 'sleep',
@@ -63,7 +63,7 @@ const MODES: ModeDefinition[] = [
     Icon: Moon,
     color: '#8866BB',
     description: 'Minimal background footprint',
-    tags: ['BG suspended', 'Low activity'],
+    tags: ['BG risk alerts on', 'Low activity'],
   },
   {
     id: 'travel',
@@ -71,7 +71,7 @@ const MODES: ModeDefinition[] = [
     Icon: Globe,
     color: '#FF8800',
     description: 'Cross-border data protection',
-    tags: ['Location masked', 'VPN active'],
+    tags: ['Location alerts on', 'Net risks surfaced'],
   },
   {
     id: 'focus',

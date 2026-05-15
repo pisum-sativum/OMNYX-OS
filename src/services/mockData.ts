@@ -1,97 +1,8 @@
 import type {
-  ThreatEvent,
   AIAgent,
   ReplayEvent,
   ScannedApp,
-  PrivacyScoreData,
 } from '@/types';
-
-export const MOCK_THREAT_EVENTS: ThreatEvent[] = [
-  {
-    id: '1',
-    appName: 'Instagram',
-    packageName: 'com.instagram.android',
-    eventType: 'microphone_access',
-    riskLevel: 'high',
-    description: 'Instagram accessed microphone while running in background',
-    aiExplanation:
-      'This behavior matches known behavioral audio fingerprinting patterns. Instagram has no legitimate need for microphone access during background operation. The timing and duration of this access aligns with advertising data collection routines documented in prior research.',
-    timestamp: new Date(Date.now() - 2 * 60 * 1000),
-    resolved: false,
-  },
-  {
-    id: '2',
-    appName: 'TikTok',
-    packageName: 'com.zhiliaoapp.musically',
-    eventType: 'clipboard_read',
-    riskLevel: 'critical',
-    description: 'TikTok read clipboard content 14 times in under 3 minutes',
-    aiExplanation:
-      'Clipboard polling at this frequency indicates systematic data harvesting. Content copied to clipboard may include passwords, bank details, personal messages, or tokens from other applications. This pattern has been linked to cross-app surveillance.',
-    timestamp: new Date(Date.now() - 5 * 60 * 1000),
-    resolved: false,
-  },
-  {
-    id: '3',
-    appName: 'FaceApp',
-    packageName: 'io.faceapp',
-    eventType: 'network_request',
-    riskLevel: 'critical',
-    description: 'FaceApp transmitted 47MB of data to servers in a foreign jurisdiction',
-    aiExplanation:
-      'Large outbound transfers to servers in regions with limited data protection laws are a significant risk. The payload volume suggests full facial biometric transmission rather than lightweight metadata. Biometric data collected this way is difficult to revoke.',
-    timestamp: new Date(Date.now() - 8 * 60 * 1000),
-    resolved: true,
-  },
-  {
-    id: '4',
-    appName: 'Weather Pro',
-    packageName: 'com.weatherpro.android',
-    eventType: 'location_access',
-    riskLevel: 'medium',
-    description: 'Weather Pro accessed precise GPS location 23 times today',
-    aiExplanation:
-      'Location polling far exceeds what weather services require. At this granularity and frequency, the data is sufficient to reconstruct daily routines, home and work addresses, and movement patterns. This is consistent with behavioral profiling for ad targeting.',
-    timestamp: new Date(Date.now() - 15 * 60 * 1000),
-    resolved: false,
-  },
-  {
-    id: '5',
-    appName: 'FlashLight Pro',
-    packageName: 'com.flashlight.pro',
-    eventType: 'suspicious_permission',
-    riskLevel: 'high',
-    description: 'Flashlight app requesting contacts, microphone, and location access',
-    aiExplanation:
-      'A flashlight utility has zero legitimate need for contacts, microphone, or location permissions. This combination is a textbook signature of a data harvesting trojan disguised as a utility. Recommend immediate review and removal.',
-    timestamp: new Date(Date.now() - 22 * 60 * 1000),
-    resolved: false,
-  },
-  {
-    id: '6',
-    appName: 'Facebook',
-    packageName: 'com.facebook.katana',
-    eventType: 'tracker_detected',
-    riskLevel: 'medium',
-    description: 'Meta SDK detected running inside 12 other installed apps',
-    aiExplanation:
-      'The Meta tracking SDK embedded in third-party apps enables cross-application behavioral profiling. Even without opening Facebook, your activity across those 12 apps is being reported to Meta servers in real time.',
-    timestamp: new Date(Date.now() - 35 * 60 * 1000),
-    resolved: false,
-  },
-  {
-    id: '7',
-    appName: 'Spotify',
-    packageName: 'com.spotify.music',
-    eventType: 'background_activity',
-    riskLevel: 'low',
-    description: 'Spotify running background processes at 3:42 AM',
-    aiExplanation:
-      'Unusual background activity during sleep hours. While Spotify maintains playlist sync, 3AM processing warrants monitoring. Activity volume exceeds expected sync operations by 340%.',
-    timestamp: new Date(Date.now() - 60 * 60 * 1000),
-    resolved: false,
-  },
-];
 
 export const MOCK_AGENTS: AIAgent[] = [
   {
@@ -210,18 +121,6 @@ export const MOCK_REPLAY_EVENTS: ReplayEvent[] = [
     agentResponse: 'Automation Agent suspended 8 background processes.',
   },
 ];
-
-export const MOCK_PRIVACY_SCORE: PrivacyScoreData = {
-  current: 67,
-  previous: 54,
-  trend: 'improving',
-  breakdown: {
-    permissions: 58,
-    trackers: 72,
-    networkActivity: 65,
-    dataCollection: 73,
-  },
-};
 
 export const MOCK_SCANNED_APPS: ScannedApp[] = [
   {

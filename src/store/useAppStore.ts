@@ -7,13 +7,20 @@ import type { AtmosphereLevel, OmnyxEvent } from '@/events/types';
 import type { AIAnalysisResult } from '@services/aiProxy';
 import {
   MOCK_AGENTS,
-  MOCK_PRIVACY_SCORE,
-  MOCK_THREAT_EVENTS,
   MOCK_REPLAY_EVENTS,
   MOCK_SCANNED_APPS,
 } from '@services/mockData';
+import { computePrivacyScore, buildThreatEvents, buildScanOmnyxEvents } from '@services/privacyIntelligence';
+import { loadScanState, saveScanState } from '@services/scanPersistence';
 
 const MAX_RECENT_EVENTS = 50;
+
+const DEFAULT_PRIVACY_SCORE: PrivacyScoreData = {
+  current: 100,
+  previous: 100,
+  trend: 'stable',
+  breakdown: { permissions: 100, trackers: 100, networkActivity: 100, dataCollection: 100 },
+};
 
 interface AppState {
   currentTheme: ThemeId;
@@ -62,20 +69,23 @@ interface AppState {
   // ── Phase 5: AI analysis cache ─────────────────────────────────────────────
   aiCache: Record<string, AIAnalysisResult>;
   setAICache: (id: string, result: AIAnalysisResult) => void;
+
+  // ── Persistence ────────────────────────────────────────────────────────────
+  loadPersistedState: () => Promise<void>;
 }
 
-export const useAppStore = create<AppState>()(subscribeWithSelector((set) => ({
+export const useAppStore = create<AppState>()(subscribeWithSelector((set, get) => ({
   currentTheme: 'nebula',
   setTheme: (theme) => set({ currentTheme: theme }),
 
-  privacyScore: MOCK_PRIVACY_SCORE,
+  privacyScore: DEFAULT_PRIVACY_SCORE,
   updatePrivacyScore: (score) =>
     set((state) => ({ privacyScore: { ...state.privacyScore, ...score } })),
 
   privacyMode: 'normal',
   setPrivacyMode: (mode) => set({ privacyMode: mode }),
 
-  threatEvents: MOCK_THREAT_EVENTS,
+  threatEvents: [],
   addThreatEvent: (event) =>
     set((state) => ({
       threatEvents: [event, ...state.threatEvents],
@@ -87,7 +97,7 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set) => ({
         e.id === id ? { ...e, resolved: true } : e
       ),
     })),
-  unreadThreatCount: 2,
+  unreadThreatCount: 0,
   clearUnreadThreats: () => set({ unreadThreatCount: 0 }),
 
   agents: MOCK_AGENTS,
@@ -110,7 +120,29 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set) => ({
   scanPhase: '',
   setScanPhase: (phase) => set({ scanPhase: phase }),
   scanResult: null,
-  setScanResult: (result) => set({ scanResult: result }),
+  setScanResult: (result) => {
+    if (!result) {
+      set({ scanResult: null });
+      return;
+    }
+    const previousScore = get().privacyScore.current;
+    const privacyScore = computePrivacyScore(result, previousScore);
+    const threatEvents = buildThreatEvents(result);
+    const omnyxEvents = buildScanOmnyxEvents(result, threatEvents);
+
+    set({
+      scanResult: result,
+      privacyScore,
+      threatEvents,
+      unreadThreatCount: threatEvents.filter((e) => !e.resolved).length,
+    });
+
+    for (const event of omnyxEvents) {
+      get().addRealtimeEvent(event);
+    }
+
+    saveScanState(result, threatEvents, privacyScore.current).catch(() => {});
+  },
 
   atmosphereLevel: 'calm',
   atmosphereIntensity: 0,
@@ -126,4 +158,21 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set) => ({
   aiCache: {},
   setAICache: (id, result) =>
     set((state) => ({ aiCache: { ...state.aiCache, [id]: result } })),
+
+  loadPersistedState: async () => {
+    const state = await loadScanState();
+    if (!state.scanResult) return;
+
+    const privacyScore = computePrivacyScore(state.scanResult, state.previousScore);
+    const threatEvents = state.threatEvents.length > 0
+      ? state.threatEvents
+      : buildThreatEvents(state.scanResult);
+
+    set({
+      scanResult: state.scanResult,
+      privacyScore,
+      threatEvents,
+      unreadThreatCount: threatEvents.filter((e) => !e.resolved).length,
+    });
+  },
 })));

@@ -333,10 +333,28 @@ function ThreatPulseWrapper({
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─── Empty State ───────────────────────────────────────────────────────────────
+
+function EmptyState({ hasScanned, C }: { hasScanned: boolean; C: any }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40, paddingBottom: 80 }}>
+      <ShieldCheck size={44} color={C.safe} strokeWidth={1.2} style={{ marginBottom: 16, opacity: 0.7 }} />
+      <Text style={{ fontSize: 15, fontWeight: '700', color: C.textPrimary, textAlign: 'center', marginBottom: 8 }}>
+        {hasScanned ? 'No threats detected' : 'No scan data yet'}
+      </Text>
+      <Text style={{ fontSize: 12, color: C.textDim, textAlign: 'center', lineHeight: 18 }}>
+        {hasScanned
+          ? 'Last scan found no suspicious permission profiles or tracker patterns.'
+          : 'Run a device scan from the Intelligence tab to detect permission risks and tracker activity.'}
+      </Text>
+    </View>
+  );
+}
+
 type FilterId = RiskLevel | 'all';
 
 export default function ThreatFeedScreen() {
-  const { threatEvents, clearUnreadThreats, currentTheme } = useAppStore();
+  const { threatEvents, clearUnreadThreats, currentTheme, scanResult } = useAppStore();
   const [filter, setFilter] = useState<FilterId>('all');
 
   const theme = THEMES[currentTheme];
@@ -444,20 +462,24 @@ export default function ThreatFeedScreen() {
           </View>
         </View>
 
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => {
-            const isCritical = !item.resolved && item.riskLevel === 'critical';
-            return (
-              <ThreatPulseWrapper isCritical={isCritical} riskColor={C.threat}>
-                <ThreatCard event={item} index={index} themeId={currentTheme} />
-              </ThreatPulseWrapper>
-            );
-          }}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 110, paddingTop: 2 }}
-        />
+        {filtered.length === 0 ? (
+          <EmptyState hasScanned={scanResult !== null} C={C} />
+        ) : (
+          <FlatList
+            data={filtered}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item, index }) => {
+              const isCritical = !item.resolved && item.riskLevel === 'critical';
+              return (
+                <ThreatPulseWrapper isCritical={isCritical} riskColor={C.threat}>
+                  <ThreatCard event={item} index={index} themeId={currentTheme} />
+                </ThreatPulseWrapper>
+              );
+            }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 110, paddingTop: 2 }}
+          />
+        )}
       </SafeAreaView>
     </View>
   );

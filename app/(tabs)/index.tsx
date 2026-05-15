@@ -146,39 +146,39 @@ const buildModeConfigs = (primary: string, accent: string): ModeConfig[] => [
     label: 'Ghost',
     icon: EyeOff,
     color: '#7788AA',
-    description: 'Maximum stealth. Invisible to all trackers.',
-    perks: ['Digital footprint erased', 'DNS over HTTPS', 'All trackers blocked'],
+    description: 'Tracker risk detection at maximum sensitivity.',
+    perks: ['Tracker risks flagged', 'High-risk apps surfaced', 'Permission analysis on'],
   },
   {
     id: 'banking',
     label: 'Banking',
     icon: Lock,
     color: '#22C55E',
-    description: 'Hardened security for financial operations.',
-    perks: ['Screen capture locked', 'Clipboard protected', 'Network encrypted'],
+    description: 'Heightened detection for financial sessions.',
+    perks: ['High-risk apps flagged', 'Clipboard risks tracked', 'Network risks surfaced'],
   },
   {
     id: 'normal',
     label: 'Normal',
     icon: Shield,
     color: primary,
-    description: 'Balanced AI protection active.',
-    perks: ['AI agents monitoring', 'Background scan on', 'Real-time analysis'],
+    description: 'Balanced privacy intelligence active.',
+    perks: ['Permission scan on', 'Tracker detection on', 'Risk analysis ready'],
   },
   {
     id: 'travel',
     label: 'Travel',
     icon: Globe,
     color: '#FF7A00',
-    description: 'Hardened for untrusted networks and roaming.',
-    perks: ['Auto VPN enabled', 'WiFi scanner active', 'Location guarded'],
+    description: 'Enhanced detection for untrusted environments.',
+    perks: ['Location risks surfaced', 'Network risk analysis', 'Tracker detection on'],
   },
   {
     id: 'focus',
     label: 'Focus',
     icon: Zap,
     color: accent,
-    description: 'Deep work. Distraction shield on.',
+    description: 'Distraction risk flagging active.',
     perks: ['Distraction apps flagged', 'Notifications filtered', 'Quiet scan mode'],
   },
   {
@@ -186,8 +186,8 @@ const buildModeConfigs = (primary: string, accent: string): ModeConfig[] => [
     label: 'Sleep',
     icon: Moon,
     color: '#9966FF',
-    description: 'Night protection. Ultra-low battery drain.',
-    perks: ['Silent monitoring', 'Low power mode', 'Night shield active'],
+    description: 'Silent monitoring. Ultra-low battery drain.',
+    perks: ['Silent monitoring', 'Low power mode', 'Background risk alerts on'],
   },
 ];
 
@@ -964,12 +964,12 @@ function OSFooter({ C }: { C: any }) {
         </Text>
       </View>
       <Animated.View style={[{ flexDirection: 'row', alignItems: 'center', gap: 5 }, lockStyle]}>
-        <Lock size={9} color={C.safe} strokeWidth={2} />
+        <Shield size={9} color={C.safe} strokeWidth={2} />
         <View>
           <Text style={{ fontSize: 7, color: C.safe, fontWeight: '700', letterSpacing: 1 }}>
-            QUANTUM ENCRYPTION
+            LOCAL ANALYSIS
           </Text>
-          <Text style={{ fontSize: 7, color: C.safe, letterSpacing: 1 }}>ACTIVE</Text>
+          <Text style={{ fontSize: 7, color: C.safe, letterSpacing: 1 }}>NO DATA LEAVES DEVICE</Text>
         </View>
       </Animated.View>
     </View>
