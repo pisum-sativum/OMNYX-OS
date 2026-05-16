@@ -34,7 +34,7 @@ import {
   RefreshCw,
   Radio,
 } from 'lucide-react-native';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { THEMES } from '@/theme';
 import { useAppStore } from '@store/useAppStore';
@@ -383,9 +383,14 @@ function AppRiskCard({
   index: number;
   C: any;
 }) {
+  const [expandedPermission, setExpandedPermission] = useState<string | null>(null);
   const riskColor = RISK_COLORS[profile.riskTier];
   const topPattern = profile.threatPatterns[0];
   const topFactor = profile.suspicionFactors[0];
+  const flaggedPermissions = profile.permissions
+    .filter((p) => p.isGranted && p.isDangerous)
+    .sort((a, b) => b.riskWeight - a.riskWeight)
+    .slice(0, 4);
 
   return (
     <Animated.View
@@ -436,6 +441,55 @@ function AppRiskCard({
             {profile.permissions.length} permissions
           </Text>
         )}
+        {flaggedPermissions.length > 0 ? (
+          <View style={{ marginTop: 4, gap: 3 }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+              {flaggedPermissions.map((perm) => {
+                const isOpen = expandedPermission === perm.shortName;
+                return (
+                  <TouchableOpacity
+                    key={perm.shortName}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${perm.shortName} permission`}
+                    accessibilityHint={perm.threat}
+                    accessibilityState={{ expanded: isOpen }}
+                    onPress={() =>
+                      setExpandedPermission(isOpen ? null : perm.shortName)
+                    }
+                    activeOpacity={0.75}
+                    style={{
+                      paddingHorizontal: 6,
+                      paddingVertical: 2,
+                      borderRadius: 5,
+                      backgroundColor: isOpen ? `${riskColor}28` : `${C.borderDim}80`,
+                      borderWidth: 1,
+                      borderColor: isOpen ? `${riskColor}55` : `${C.borderDim}`,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 8,
+                        fontWeight: '700',
+                        color: isOpen ? riskColor : C.textDim,
+                        letterSpacing: 0.4,
+                      }}
+                    >
+                      {perm.shortName}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            {expandedPermission ? (
+              <Text style={{ fontSize: 9, color: C.textPrimary, lineHeight: 13 }}>
+                {
+                  flaggedPermissions.find((p) => p.shortName === expandedPermission)
+                    ?.threat
+                }
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
       </View>
 
       {/* Score */}
