@@ -1,0 +1,95 @@
+name: Contributor Task
+description: A structured mission for intermediate contributors.
+title: "task: "
+labels: ["enhancement", "help wanted"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Contributor Task
+
+        A focused mission with clear scope. Read every field before claiming this task.
+
+  - type: input
+    id: mission
+    attributes:
+      label: "Mission"
+      placeholder: "Implement swipe-to-dismiss on Threat Feed cards"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is currently missing or broken?
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected Outcome
+      description: What will the user experience after this is merged?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      options:
+        - Beginner
+        - Intermediate
+        - Advanced
+    validations:
+      required: true
+
+  - type: input
+    id: time
+    attributes:
+      label: Estimated Time
+      placeholder: "2-4 hours"
+    validations:
+      required: true
+
+  - type: input
+    id: stack
+    attributes:
+      label: Tech Stack
+      placeholder: "React Native Reanimated, TypeScript, Zustand"
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources
+      placeholder: |
+        - CONTRIBUTING.md
+        - React Native Reanimated docs
+        - Existing animation examples: app/(tabs)/replay.tsx
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - Feature works on both platforms
+        - No TypeScript errors
+        - Follows existing animation patterns
+        - Tested manually
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: claim
+    attributes:
+      label: Before you start
+      options:
+        - label: I have read CONTRIBUTING.md.
+          required: true
+        - label: I have commented "I'd like to work on this" to claim the issue.
+          required: true
+        - label: I understand I have 7 days to submit a PR once assigned.
+          required: true

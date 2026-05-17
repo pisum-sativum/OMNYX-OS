@@ -1,0 +1,85 @@
+name: Feature Request
+description: Propose a new capability or improvement.
+title: "feat: "
+labels: ["feature request", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+
+        Good ideas make OMNYX better for everyone.
+        Be specific. Vague requests will be closed.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Feature summary
+      description: One sentence — what do you want to add or change?
+      placeholder: "Add a haptic feedback pulse when a critical threat is detected."
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the gap. Why does this matter for users?
+      placeholder: "Currently there is no physical feedback when a high-severity threat fires. Users miss alerts when the screen is off or they are not looking."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature in detail. How should it work?
+      placeholder: "Use Haptics.notificationAsync(NotificationFeedbackType.Error) on critical threat events. Add a toggle in Settings to enable/disable."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you consider? Why is this approach better?
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - UI / Animations
+        - AI / Intelligence Engine
+        - Threat Detection
+        - Privacy Modes
+        - Backend / Proxy
+        - Performance
+        - Accessibility
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Estimated difficulty
+      options:
+        - Beginner (under 2 hours)
+        - Intermediate (2-8 hours)
+        - Advanced (1-3 days)
+        - Major (requires design discussion)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I searched existing issues and this has not been requested before.
+          required: true
+        - label: This fits within the OMNYX vision (privacy-first, cinematic, AI-powered).
+          required: true

@@ -21,6 +21,21 @@
 
 ---
 
+## Join OMNYX
+
+Building AI tools, mobile experiences, and open-source products.
+
+| | |
+|---|---|
+| **Beginner Friendly** | Scoped issues with step-by-step instructions |
+| **Fast PR Reviews** | Feedback within 48-72 hours |
+| **Open to Contributors** | No gatekeeping — fork and build |
+| **Real Project Experience** | AI, mobile, privacy — production-quality codebase |
+
+**Start here** — [Good First Issues](https://github.com/OMNYX-OS/OMNYX-OS/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+
+---
+
 ## What is OMNYX?
 
 OMNYX is an experimental, open-source **AI privacy operating system** for mobile devices. It continuously monitors device behavior, detects surveillance threats in real time, and interprets them through an autonomous AI swarm - then presents the intelligence in a cinematic, deeply visual interface.
@@ -342,6 +357,27 @@ MIT License. See [LICENSE](LICENSE).
 
 ---
 
+## Contributors
+
+<a href="https://github.com/OMNYX-OS/OMNYX-OS/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=OMNYX-OS/OMNYX-OS" />
+</a>
+
+---
+
+## Contributor of the Month
+
+> Announced monthly in [Discussions](https://github.com/OMNYX-OS/OMNYX-OS/discussions).
+
+| Badge | Meaning |
+|-------|---------|
+| Top Contributor | Most merged PRs in the month |
+| Fast Fixer | Quickest bug resolution |
+| First PR | Opened their first merged pull request |
+| Core Contributor | Consistent, high-quality contributions |
+
+---
+
 ## Acknowledgments
 
 Built with intention. Designed for privacy. Engineered for the future.
@@ -350,6 +386,9 @@ Built with intention. Designed for privacy. Engineered for the future.
 
 <div align="center">
 
-**OMNYX OS V1.0 - BUILT FOR PRIVACY. DESIGNED FOR FREEDOM.**
+**OMNYX OS — BUILT FOR PRIVACY. DESIGNED FOR FREEDOM.**
+
+[![Good First Issues](https://img.shields.io/github/issues/OMNYX-OS/OMNYX-OS/good%20first%20issue?style=flat-square&color=00FF88&label=Good%20First%20Issues)](https://github.com/OMNYX-OS/OMNYX-OS/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+[![Contributors](https://img.shields.io/github/contributors/OMNYX-OS/OMNYX-OS?style=flat-square&color=7C3AED)](https://github.com/OMNYX-OS/OMNYX-OS/graphs/contributors)
 
 </div>

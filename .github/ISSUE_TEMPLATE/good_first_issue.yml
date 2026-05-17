@@ -1,0 +1,100 @@
+name: Good First Issue
+description: A scoped, well-defined task for first-time contributors.
+title: "gfi: "
+labels: ["good first issue", "beginner"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Good First Issue
+
+        This template is for maintainers creating contributor-ready tasks.
+        Every field must be filled out — contributors rely on this to get started without asking questions.
+
+  - type: input
+    id: title
+    attributes:
+      label: Task title
+      placeholder: "Add empty state UI for Threat Feed when no threats exist"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What is the current behavior and why does this matter?
+      placeholder: "Currently when no threats have been detected, the Threat Feed tab shows a blank white area. This is confusing for first-time users who don't know if the app is working."
+    validations:
+      required: true
+
+  - type: textarea
+    id: task
+    attributes:
+      label: What needs to be done
+      description: Exact, step-by-step instructions.
+      placeholder: |
+        1. Open `app/(tabs)/threat-feed.tsx`
+        2. Locate the `threatEvents` list render
+        3. Add an empty state component when `threatEvents.length === 0`
+        4. Empty state should show: a shield icon, "No Active Threats" text, and a subline "Run a device scan to analyze your privacy posture"
+        5. Match the active theme's colors using `C.textPrimary` and `C.textDim`
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Exactly what does "done" look like?
+      placeholder: |
+        - Empty state appears when threatEvents is empty
+        - Empty state disappears when threats exist
+        - Colors match the active theme
+        - No TypeScript errors (`npx tsc --noEmit` passes)
+        - Tested on both Android and iOS (or emulator/simulator)
+    validations:
+      required: true
+
+  - type: input
+    id: files
+    attributes:
+      label: Files to edit
+      placeholder: "app/(tabs)/threat-feed.tsx"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      options:
+        - Beginner
+        - Intermediate
+    validations:
+      required: true
+
+  - type: input
+    id: time
+    attributes:
+      label: Estimated time
+      placeholder: "30-60 minutes"
+    validations:
+      required: true
+
+  - type: input
+    id: stack
+    attributes:
+      label: Tech stack
+      placeholder: "React Native, TypeScript, NativeWind"
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Helpful resources
+      placeholder: |
+        - CONTRIBUTING.md — setup instructions
+        - src/theme/index.ts — theme color reference
+        - app/(tabs)/replay.tsx — example of empty state pattern

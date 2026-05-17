@@ -1,0 +1,112 @@
+name: Bug Report
+description: Something is broken. Help us fix it.
+title: "bug: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Reporting a Bug
+
+        Thanks for taking the time to report this. Clear bug reports get fixed faster.
+        Fill out every section — incomplete reports will be closed.
+
+  - type: input
+    id: summary
+    attributes:
+      label: What happened?
+      description: One clear sentence describing the bug.
+      placeholder: "The scan button freezes after the second tap on Android 13."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps from launch to bug.
+      placeholder: |
+        1. Open the app
+        2. Go to the Intelligence tab
+        3. Tap "Scan Device"
+        4. Tap again immediately
+        5. App freezes
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened?
+      placeholder: The second tap should restart or show a "scan in progress" state.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened?
+      placeholder: The UI freezes, the scan progress bar stops at 40%, and no further interaction is possible.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android (physical device)
+        - Android (emulator)
+        - iOS (physical device)
+        - iOS (simulator)
+        - Both
+    validations:
+      required: true
+
+  - type: input
+    id: os_version
+    attributes:
+      label: OS version
+      placeholder: "Android 13 / iOS 17.2"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Node, npm, Expo SDK versions.
+      placeholder: |
+        Node: 20.11.0
+        npm: 10.2.4
+        Expo SDK: 54
+        React Native: 0.81
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or errors
+      description: Paste any console errors, crash logs, or Metro bundler output.
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or screen recording
+      description: Attach any visual evidence. Drag and drop files here.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: I am on the latest version of the repo (pulled main today).
+          required: true
+        - label: I followed all setup steps in the README.
+          required: true

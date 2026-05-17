@@ -1,0 +1,61 @@
+name: Documentation Improvement
+description: Fix, expand, or add documentation.
+title: "docs: "
+labels: ["documentation", "good first issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Documentation Improvement
+
+        Good documentation is what separates a project people use from one they avoid.
+        Documentation contributions are fully valid open-source work.
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation type
+      options:
+        - README
+        - CONTRIBUTING.md
+        - Code comments / JSDoc
+        - API documentation
+        - Architecture diagram
+        - Setup guide
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: File or section
+      placeholder: "src/services/privacyIntelligence.ts — computePrivacyScore function"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or missing?
+      placeholder: "The computePrivacyScore function has no comments explaining how it weights the four score dimensions. A new contributor cannot understand the logic without reading the full implementation."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed improvement
+      placeholder: "Add JSDoc block explaining params, return type, and a brief description of the weighting formula."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have confirmed this section is currently incomplete or incorrect.
+          required: true
+        - label: My proposed content is accurate (I have verified against the code or official sources).
+          required: true

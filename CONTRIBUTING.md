@@ -1,232 +1,282 @@
+<div align="center">
+
 # Contributing to OMNYX
 
-Thank you for your interest in contributing. OMNYX is an experimental, open-source AI privacy operating system. Every contribution - whether a bug fix, new feature, visual improvement, or documentation update - matters.
+**AI Privacy Intelligence Operating System**
 
-This guide helps you get oriented quickly.
+*Open source. Founder-built. Contributor-powered.*
 
----
+[![Good First Issues](https://img.shields.io/github/issues/OMNYX-OS/OMNYX-OS/good%20first%20issue?style=flat-square&color=00FF88&label=Good%20First%20Issues)](https://github.com/OMNYX-OS/OMNYX-OS/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-00FF88?style=flat-square)](https://github.com/OMNYX-OS/OMNYX-OS/pulls)
+[![Community](https://img.shields.io/badge/Community-Discussions-7C3AED?style=flat-square)](https://github.com/OMNYX-OS/OMNYX-OS/discussions)
 
-## Project Philosophy
-
-OMNYX is not a dashboard. It is designed to feel like a **living intelligence system** - atmospheric, reactive, and visually intentional.
-
-Before contributing, internalize these principles:
-
-- **No clutter.** Every element earns its place.
-- **No generic UI.** If it looks like a SaaS app, it is wrong.
-- **Performance is non-negotiable.** 60fps animations, always.
-- **Security is first-class.** Especially in anything touching the AI backend.
-- **TypeScript strict mode.** No `any` shortcuts.
+</div>
 
 ---
 
-## Getting Started
+## Start Contributing in 5 Minutes
 
-### Fork and Clone
+No permission needed. No onboarding call. Just fork and build.
+
+```
+Step 1 — Fork
+Step 2 — Clone
+Step 3 — Install
+Step 4 — Run
+Step 5 — Pick an issue
+Step 6 — Open a PR
+```
+
+### Step 1 — Fork
+
+Click **Fork** in the top-right corner of [OMNYX-OS/OMNYX-OS](https://github.com/OMNYX-OS/OMNYX-OS).
+
+### Step 2 — Clone
 
 ```bash
-# Fork the repo on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/omnyx.git
-cd omnyx
+git clone https://github.com/YOUR_USERNAME/OMNYX-OS.git
+cd OMNYX-OS
+```
+
+### Step 3 — Install
+
+```bash
 npm install
+```
+
+### Step 4 — Run
+
+```bash
+# Copy environment file
 cp .env.example .env
+
+# Start Expo dev server
 npx expo start
 ```
 
-### Backend (if working on AI features)
+Scan the QR code with Expo Go, or press `a` for Android emulator, `i` for iOS simulator.
+
+Optional — start the AI proxy (needed only for AI explanation features):
 
 ```bash
-cd backend
-npm install
-cp .env.example .env
-# Add your ANTHROPIC_API_KEY to .env
-npm run dev
+npm run server
+# Runs on http://localhost:3001
 ```
 
-### TypeScript Check
+### Step 5 — Pick an issue
 
-Before every PR, run:
+Browse [Good First Issues](https://github.com/OMNYX-OS/OMNYX-OS/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) and comment `"I'd like to work on this"` to claim it. You'll be assigned within 24 hours.
+
+### Step 6 — Open a PR
 
 ```bash
+# Create your branch
+git checkout -b feat/your-feature-name
+
+# Make your changes, then verify TypeScript
 npx tsc --noEmit
+
+# Commit
+git add .
+git commit -m "feat: describe what you did"
+
+# Push
+git push origin feat/your-feature-name
 ```
 
-Zero errors required.
+Open a pull request against `main`. Fill out the PR template completely.
 
 ---
 
 ## Folder Structure
 
 ```
-app/                    Screens and navigation (Expo Router)
-  (tabs)/               Tab screens
-  (auth)/               Auth screens
-src/
-  components/           Shared UI components
-  hooks/                Custom React hooks
-  services/             External integrations (AI proxy, Supabase)
-  store/                Zustand global state (useAppStore.ts)
-  theme/                Theme definitions (5 themes)
-  types/                TypeScript interfaces
-  events/               Event bus and atmosphere engine
-backend/
+omnyx/
+  app/                   Expo Router screens
+    (tabs)/              Core tab screens (home, threats, agents, replay, modes)
   src/
-    routes/             API handlers
-    middleware/         Rate limiting, validation
-    services/           AI provider wrappers
-    validators/         Zod schemas
-    security/           Sanitization, content filtering
+    components/          Shared UI components
+    hooks/               Custom React hooks
+    services/            Data services (mock data, AI proxy, scan logic)
+    store/               Zustand global state (useAppStore.ts)
+    theme/               Theme system — 5 themes, color tokens
+    types/               TypeScript type definitions
+    events/              Event bus, atmosphere engine
+  server/                Node.js AI proxy (Express, runs with npm run server)
+  android/               Android native project
+  ios/                   iOS native project
+  .github/               Issue templates, PR template
 ```
+
+Key files to know:
+
+| File | Purpose |
+|------|---------|
+| `src/store/useAppStore.ts` | Global state — all app data lives here |
+| `src/theme/index.ts` | All theme color tokens |
+| `src/services/mockData.ts` | Mock agents, apps, events |
+| `src/services/privacyIntelligence.ts` | Score computation, threat building |
+| `server/proxy.ts` | AI proxy server |
+
+---
+
+## Code Standards
+
+### TypeScript
+
+- Strict mode is on. All code must pass `npx tsc --noEmit`.
+- No `any` unless absolutely unavoidable and commented.
+- Type all function parameters and return values.
+
+### React Native
+
+- Never use hardcoded colors. Always pull from the active theme: `const C = THEMES[currentTheme].colors`
+- Use `useAppStore((s) => s.field)` for store subscriptions — never `useAppStore.getState()` inside render.
+- Animations use React Native Reanimated v4. Always call `cancelAnimation()` in cleanup.
+- No `console.log` in production code paths.
+
+### Styling
+
+- NativeWind (Tailwind) for layout where applicable.
+- Theme-aware colors from `C.*` for all visual properties.
+- Follow `borderRadius`, `padding`, and `gap` conventions of surrounding components.
+
+### Comments
+
+- Write comments only when the WHY is non-obvious from the code itself.
+- No block comments that describe what the code does — the code does that.
 
 ---
 
 ## Branch Naming
 
 ```
-feat/short-description        New feature
-fix/short-description         Bug fix
-refactor/short-description    Code cleanup or restructure
-docs/short-description        Documentation only
-ui/short-description          Visual or animation changes
-security/short-description    Security-related changes
+feat/short-description       New feature
+fix/short-description        Bug fix
+docs/short-description       Documentation
+refactor/short-description   Refactor with no behavior change
+test/short-description       Tests only
+ui/short-description         Visual / animation only
 ```
 
 Examples:
 ```
-feat/swarm-detail-screen
-fix/reanimated-opacity-conflict
-ui/nebula-orbital-ring-depth
-docs/contributing-setup-guide
+feat/haptic-feedback-threats
+fix/scan-button-freeze-android
+docs/add-jsdoc-useappstore
+ui/empty-state-threat-feed
 ```
 
 ---
 
 ## Commit Message Format
 
-```
-type: short description in lowercase
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-Optional body for complex changes.
+```
+type: short description (under 72 characters)
 ```
 
-Types: `feat`, `fix`, `refactor`, `docs`, `ui`, `security`, `perf`, `test`
+Types:
+
+| Type | When to use |
+|------|-------------|
+| `feat` | New feature or capability |
+| `fix` | Bug fix |
+| `docs` | Documentation only |
+| `ui` | Visual / animation change |
+| `refactor` | Code change with no behavior change |
+| `test` | Tests only |
+| `chore` | Build, config, dependency updates |
 
 Examples:
 ```
-feat: add per-agent detail screen to swarm view
-fix: resolve orbital ring overflow on narrow screens
-ui: deepen nebula atmospheric glow layers
-docs: expand contributing setup guide
-security: add request body size limit to ai proxy
-```
-
-No generic commit messages. No "update files". No "fix stuff".
-
----
-
-## Pull Request Workflow
-
-1. Branch from `main`
-2. Keep PRs focused - one concern per PR
-3. Run `npx tsc --noEmit` before submitting
-4. Include screenshots or screen recordings for any UI changes
-5. Describe what changed and why, not just what
-6. Link any related issues
-
-### PR Description Template
-
-```
-## What
-Brief description of the change.
-
-## Why
-Motivation. What problem does this solve?
-
-## How
-Key implementation decisions.
-
-## Screenshots
-(For UI changes - required)
+feat: add empty state for threat feed tab
+fix: cancel reanimated scan pulse on unmount
+docs: add jsdoc to computePrivacyScore
+ui: increase font size on permission chip labels
 ```
 
 ---
 
-## Coding Standards
+## How to Claim an Issue
 
-### TypeScript
+1. Find an open issue labeled `good first issue` or `help wanted`.
+2. Comment: `"I'd like to work on this."`
+3. A maintainer will assign you within 24 hours.
+4. You have **7 days** to open a PR. If you need more time, comment on the issue.
+5. If no update after 7 days, the issue may be reassigned.
 
-- Strict mode. No implicit `any`.
-- Prefer `type` over `interface` for simple shapes.
-- Use explicit return types on all exported functions.
-- Use `z.infer<typeof Schema>` for Zod-derived types.
-
-### React Native / Expo
-
-- All animations must use React Native Reanimated v4.
-- Never use 3-digit hex values with opacity suffix appended (e.g., `#888` + `25` = `#88825` - invalid). Always use 6-digit hex.
-- `useAnimatedStyle` returning `opacity` must not be on an `Animated.View` that also has an `entering` prop - use manual `useSharedValue` entrance instead.
-- `pointerEvents="box-none"` on absolute overlay containers so underlying screens remain touchable.
-
-### Theme System
-
-All colors come from the theme system in `src/theme/index.ts`. Never hardcode colors in components - always use `C = theme.colors` from the current theme.
-
-### Animation Rules
-
-- All animations must `cancelAnimation()` on unmount.
-- Avoid opacity-based ring/echo animations - use `transform: [{ scale }]` only.
-- Pulse durations should vary with `atmosphereLevel` where appropriate.
-- Target 60fps - profile with Flipper if uncertain.
-
-### Backend (AI Proxy)
-
-- All inputs go through Zod validation before touching any service.
-- All AI outputs go through Zod validation before being sent to the client.
-- Never interpolate user-supplied content directly into the system prompt.
-- User data goes in the user message as serialized JSON only.
-- New routes require rate limiting middleware.
+One active claim at a time per contributor. Finish or drop one before claiming another.
 
 ---
 
-## Issue Labels
+## How Reviews Work
 
-| Label | Meaning |
-|---|---|
-| `good first issue` | Suitable for new contributors |
-| `frontend` | React Native / Expo UI work |
-| `backend` | Fastify API / AI proxy |
-| `ai` | AI engine, prompts, swarm logic |
-| `security` | Security-sensitive work - requires careful review |
-| `enhancement` | New feature or improvement |
-| `bug` | Something is broken |
-| `documentation` | Docs, README, comments |
-| `ui` | Visual design, animations, themes |
-| `performance` | Speed, rendering, memory |
+- Reviews happen within **48-72 hours** of a PR being opened.
+- A PR needs **1 maintainer approval** to merge.
+- Feedback will be specific, actionable, and respectful.
+- Address all comments before requesting re-review.
+- Small, focused PRs get reviewed and merged faster.
 
----
+What reviewers check:
 
-## Good First Issues
-
-Look for issues labeled `good first issue`. These are scoped tasks with clear requirements:
-
-- Adding a new privacy mode
-- Extending mock intelligence reports
-- Improving theme color depth
-- Writing missing type definitions
-- Adding missing screenshots to README
+- `npx tsc --noEmit` passes
+- No hardcoded colors, no secrets
+- Feature matches the issue scope exactly
+- Animations have `cancelAnimation()` cleanup
+- Code follows existing patterns — no unnecessary abstractions
 
 ---
 
-## What Not To Do
+## PR Workflow
 
-- Do not submit AI-generated code without reviewing it yourself
-- Do not add unrelated changes to a focused PR
-- Do not hardcode colors, strings, or API keys
-- Do not break existing TypeScript types without a migration plan
-- Do not add dependencies without discussing first
+```
+fork → branch → build → tsc check → PR → review → revisions → merge
+```
+
+- Target branch is always `main`.
+- One feature per PR. Do not bundle unrelated changes.
+- Include screenshots for any UI change.
+- Link the issue with `Fixes #123` in the PR body.
+
+---
+
+## Contributor Rewards
+
+| Milestone | Recognition |
+|-----------|-------------|
+| First PR merged | `First PR` badge + shoutout in Discussions |
+| 3 PRs merged | Listed in README Contributors section |
+| 5 PRs merged | Contributor Spotlight post in Discussions |
+| 10 PRs merged | Community role + profile shoutout |
+| Major contribution | Core team invitation |
+
+Contributor of the Month is announced in Discussions at the end of each month, based on impact, code quality, and responsiveness to reviews.
+
+---
+
+## GSSoC Contributors
+
+OMNYX participates in [Girl Script Summer of Code](https://gssoc.girlscript.tech).
+
+GSSoC-tagged issues are labeled `LFX` or `GSSoC`. All standard contribution rules apply. Point assignments follow GSSoC program guidelines.
 
 ---
 
 ## Questions
 
-Open a GitHub Discussion or comment on a relevant issue. We are builder-first here - questions are welcome.
+Open a [Discussion](https://github.com/OMNYX-OS/OMNYX-OS/discussions) — don't open an issue for questions.
+
+Category guide:
+- **Q&A** — setup help, "how does X work"
+- **Ideas** — feature proposals before filing a formal issue
+- **Show and Tell** — share what you built with OMNYX
+
+---
+
+<div align="center">
+
+**Every PR makes OMNYX sharper. Thank you for building with us.**
+
+</div>

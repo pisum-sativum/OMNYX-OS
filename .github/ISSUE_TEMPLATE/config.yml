@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Join the Community
+    url: https://github.com/OMNYX-OS/OMNYX-OS/discussions
+    about: Ask questions, share ideas, and connect with contributors.
+  - name: Read the Contribution Guide
+    url: https://github.com/OMNYX-OS/OMNYX-OS/blob/main/CONTRIBUTING.md
+    about: Everything you need to make your first contribution.
