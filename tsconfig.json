@@ -52,6 +52,7 @@
   ],
   "exclude": [
     "backend",
+    "server",
     "node_modules"
   ]
 }

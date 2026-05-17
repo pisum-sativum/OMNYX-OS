@@ -56,7 +56,18 @@ function buildPath(pts: Array<{ x: number; y: number }>) {
 
 function WaveformPanel({ themeId }: { themeId: string }) {
   const C = THEMES[themeId as keyof typeof THEMES].colors;
-  const RAW = [54, 56, 62, 58, 65, 64, 67];
+  const privacyScore = useAppStore((s) => s.privacyScore);
+  const scanResult = useAppStore((s) => s.scanResult);
+
+  const prev = scanResult ? privacyScore.previous : 50;
+  const curr = scanResult ? privacyScore.current : 50;
+
+  // Smooth ease-in-out interpolation from prev to curr across 7 points
+  const RAW = Array.from({ length: 7 }, (_, i) => {
+    const t = i / 6;
+    const smooth = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    return Math.round(prev + (curr - prev) * smooth);
+  });
 
   const pts = RAW.map((v, i) => ({
     x: (i / (RAW.length - 1)) * CHART_W,
@@ -66,6 +77,10 @@ function WaveformPanel({ themeId }: { themeId: string }) {
   const line = buildPath(pts);
   const last = pts[pts.length - 1];
   const fill = `${line} L ${last.x.toFixed(1)} ${CHART_H} L 0 ${CHART_H} Z`;
+
+  const delta = curr - prev;
+  const deltaColor = delta >= 0 ? C.safe : C.threat;
+  const deltaLabel = `${delta >= 0 ? '+' : ''}${delta} pts`;
 
   const scanX = useSharedValue(0);
   useEffect(() => {
@@ -87,7 +102,7 @@ function WaveformPanel({ themeId }: { themeId: string }) {
   return (
     <View style={{ marginHorizontal: 20, marginBottom: 28 }}>
       <Text style={{ fontSize: 10, letterSpacing: 2.5, color: C.textDim, marginBottom: 10, fontWeight: '600' }}>
-        7H MEMORY TRACE
+        {scanResult ? 'SCORE TREND' : 'SCORE TRACE'}
       </Text>
       <View style={{
         backgroundColor: C.surface1, borderRadius: 18, padding: CHART_PAD,
@@ -106,7 +121,6 @@ function WaveformPanel({ themeId }: { themeId: string }) {
             <Circle cx={last.x} cy={last.y} r={4} fill={C.primary} />
             <Circle cx={last.x} cy={last.y} r={9} fill={C.primary} opacity="0.18" />
           </Svg>
-          {/* Animated scan line */}
           <Animated.View style={[{
             position: 'absolute', top: 0, left: 0, width: 1.5, height: CHART_H,
             backgroundColor: `${C.primary}80`,
@@ -115,9 +129,9 @@ function WaveformPanel({ themeId }: { themeId: string }) {
           }, scanStyle]} />
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-          <Text style={{ fontSize: 9, color: C.textDim }}>-7h</Text>
-          <Text style={{ fontSize: 11, color: C.primary, fontWeight: '700' }}>67 now</Text>
-          <Text style={{ fontSize: 9, color: C.safe }}>+13 pts</Text>
+          <Text style={{ fontSize: 9, color: C.textDim }}>{scanResult ? 'prev' : '--'}</Text>
+          <Text style={{ fontSize: 11, color: C.primary, fontWeight: '700' }}>{curr} now</Text>
+          <Text style={{ fontSize: 9, color: deltaColor }}>{scanResult ? deltaLabel : '--'}</Text>
         </View>
       </View>
     </View>

@@ -20,7 +20,7 @@
  *     network_request, background_activity
  */
 
-import type { ThreatEvent, PrivacyScoreData, TrendDirection } from '@/types';
+import type { ThreatEvent, PrivacyScoreData, TrendDirection, ReplayEvent } from '@/types';
 import type { ScanResult, AppRiskProfile } from '@/types/permissions';
 import type { OmnyxEvent } from '@/events/types';
 import { detectTrackers } from './trackerDetector';
@@ -232,6 +232,49 @@ export function buildScanOmnyxEvents(
   }
 
   return events;
+}
+
+// ── ReplayEvent generation from scan data ────────────────────────────────────
+
+export function buildReplayEvents(
+  scanResult: ScanResult,
+  threatEvents: ThreatEvent[],
+  privacyScore: PrivacyScoreData,
+): ReplayEvent[] {
+  const events: ReplayEvent[] = [];
+  const riskChangeMap: Record<string, number> = {
+    critical: 15, high: 8, medium: 4, low: 1, safe: 0,
+  };
+
+  const delta = privacyScore.current - privacyScore.previous;
+  events.push({
+    id: `replay_scan_${scanResult.scannedAt.getTime()}`,
+    title: 'Device Scan Complete',
+    description: `${scanResult.appCount} apps analyzed. Privacy score: ${privacyScore.current}/100.${!scanResult.isNativeScan ? ' Simulation mode.' : ''}`,
+    riskChange: delta,
+    riskLevel: privacyScore.current >= 70 ? 'safe' : privacyScore.current >= 50 ? 'medium' : 'high',
+    timestamp: scanResult.scannedAt,
+    agentResponse: `Permission analysis engine processed ${scanResult.appCount} application profiles.`,
+  });
+
+  for (const threat of threatEvents.slice(0, 5)) {
+    events.push({
+      id: `replay_threat_${threat.id}`,
+      title: threat.eventType === 'tracker_detected'
+        ? 'Tracker Signature Identified'
+        : 'Suspicious Permission Profile',
+      description: threat.description.slice(0, 140),
+      riskChange: riskChangeMap[threat.riskLevel] ?? 5,
+      riskLevel: threat.riskLevel,
+      timestamp: threat.timestamp,
+      appName: threat.appName,
+      agentResponse: threat.eventType === 'tracker_detected'
+        ? 'Threat Agent flagged tracker SDK signature from permission profile analysis.'
+        : 'Threat Agent identified anomalous permission cluster.',
+    });
+  }
+
+  return events.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 }
 
 // ── Install event → single ThreatEvent ────────────────────────────────────────

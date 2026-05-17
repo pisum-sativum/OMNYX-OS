@@ -12,13 +12,25 @@
  * - Analysis is local; no network calls triggered from this module.
  */
 
-import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
+import { NativeEventEmitter, Platform } from 'react-native';
+import { requireNativeModule } from 'expo-modules-core';
 import { calculateRiskProfile } from './riskEngine';
 import { buildInstallThreatEvent } from './privacyIntelligence';
 import type { ThreatEvent } from '@/types';
 
-const NativeMonitor = Platform.OS === 'android'
-  ? (NativeModules.OmnyxPackageMonitor as { startMonitoring: () => void; stopMonitoring: () => void; addListener: (event: string) => void; removeListeners: (count: number) => void } | null ?? null)
+const NativeMonitor: {
+  startMonitoring: () => void;
+  stopMonitoring: () => void;
+  addListener: (event: string) => void;
+  removeListeners: (count: number) => void;
+} | null = Platform.OS === 'android'
+  ? (() => {
+      try {
+        return requireNativeModule('OmnyxPackageMonitor');
+      } catch {
+        return null;
+      }
+    })()
   : null;
 
 type InstallCallback = (threatEvent: ThreatEvent) => void;

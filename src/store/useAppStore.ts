@@ -10,7 +10,7 @@ import {
   MOCK_REPLAY_EVENTS,
   MOCK_SCANNED_APPS,
 } from '@services/mockData';
-import { computePrivacyScore, buildThreatEvents, buildScanOmnyxEvents } from '@services/privacyIntelligence';
+import { computePrivacyScore, buildThreatEvents, buildScanOmnyxEvents, buildReplayEvents } from '@services/privacyIntelligence';
 import { loadScanState, saveScanState } from '@services/scanPersistence';
 
 const MAX_RECENT_EVENTS = 50;
@@ -129,11 +129,13 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set, get) =
     const privacyScore = computePrivacyScore(result, previousScore);
     const threatEvents = buildThreatEvents(result);
     const omnyxEvents = buildScanOmnyxEvents(result, threatEvents);
+    const replayEvents = buildReplayEvents(result, threatEvents, privacyScore);
 
     set({
       scanResult: result,
       privacyScore,
       threatEvents,
+      replayEvents,
       unreadThreatCount: threatEvents.filter((e) => !e.resolved).length,
     });
 
@@ -167,11 +169,13 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set, get) =
     const threatEvents = state.threatEvents.length > 0
       ? state.threatEvents
       : buildThreatEvents(state.scanResult);
+    const replayEvents = buildReplayEvents(state.scanResult, threatEvents, privacyScore);
 
     set({
       scanResult: state.scanResult,
       privacyScore,
       threatEvents,
+      replayEvents,
       unreadThreatCount: threatEvents.filter((e) => !e.resolved).length,
     });
   },

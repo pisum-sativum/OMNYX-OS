@@ -2,6 +2,7 @@ package expo.modules.permissionscanner
 
 import android.content.pm.PackageManager
 import android.content.pm.PackageInfo
+import android.os.Build
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.Promise
@@ -25,14 +26,10 @@ class PermissionScannerModule : Module() {
             val ctx = appContext.reactContext ?: return@AsyncFunction false
             val pm = ctx.packageManager
 
-            // QUERY_ALL_PACKAGES was granted at install time via app.json.
-            // This check is a runtime sanity guard.
-            val granted = pm.checkPermission(
+            pm.checkPermission(
                 "android.permission.QUERY_ALL_PACKAGES",
                 ctx.packageName
             ) == PackageManager.PERMISSION_GRANTED
-
-            granted
         }
 
         AsyncFunction("scanInstalledApps") { promise: Promise ->
@@ -41,30 +38,32 @@ class PermissionScannerModule : Module() {
                     ?: return@AsyncFunction promise.reject("NO_CONTEXT", "React context unavailable", null)
 
                 val pm = ctx.packageManager
-                val flags = PackageManager.GET_PERMISSIONS
 
-                @Suppress("DEPRECATION")
-                val packages: List<PackageInfo> = pm.getInstalledPackages(flags)
+                val packages: List<PackageInfo> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    pm.getInstalledPackages(PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
+                } else {
+                    @Suppress("DEPRECATION")
+                    pm.getInstalledPackages(PackageManager.GET_PERMISSIONS)
+                }
 
                 val results = mutableListOf<Map<String, Any>>()
 
                 for (pkg in packages) {
-                    // Skip packages with no name (malformed entries)
+                    val appInfo = pkg.applicationInfo ?: continue
+
                     val appName = try {
-                        pm.getApplicationLabel(pkg.applicationInfo).toString().trim().take(64)
+                        pm.getApplicationLabel(appInfo).toString().trim().take(64)
                     } catch (_: Exception) {
                         pkg.packageName
                     }
 
                     val rawPerms: Array<String> = pkg.requestedPermissions ?: emptyArray()
 
-                    // Map full Android permission names to our short names.
-                    // Unknown permissions are omitted — no exposure of unrecognized data.
                     val shortPerms = rawPerms
                         .mapNotNull { fullName -> PERMISSION_MAP[fullName] }
                         .distinct()
 
-                    val isSystem = (pkg.applicationInfo.flags and
+                    val isSystem = (appInfo.flags and
                             android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
 
                     results.add(
@@ -72,8 +71,8 @@ class PermissionScannerModule : Module() {
                             "packageName" to pkg.packageName,
                             "appName" to appName,
                             "permissions" to shortPerms,
-                            "installTime" to (pkg.firstInstallTime),
-                            "lastUpdated" to (pkg.lastUpdateTime),
+                            "installTime" to pkg.firstInstallTime,
+                            "lastUpdated" to pkg.lastUpdateTime,
                             "versionName" to (pkg.versionName ?: ""),
                             "isSystemApp" to isSystem,
                         )
@@ -90,8 +89,6 @@ class PermissionScannerModule : Module() {
     }
 
     companion object {
-        // Maps android.permission.* full names to our internal short names.
-        // Only permissions in our database are included — reduces attack surface.
         private val PERMISSION_MAP = mapOf(
             "android.permission.ACCESS_FINE_LOCATION"        to "ACCESS_FINE_LOCATION",
             "android.permission.ACCESS_COARSE_LOCATION"      to "ACCESS_COARSE_LOCATION",

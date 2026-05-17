@@ -13,12 +13,8 @@ import expo.modules.kotlin.modules.ModuleDefinition
  *
  * Security notes:
  * - Only listens for ACTION_PACKAGE_ADDED and ACTION_PACKAGE_REPLACED.
- * - Does NOT listen for PACKAGE_REMOVED (not needed for threat detection).
- * - Returns only package name, app name, and permission list - same data
- *   available to any app via PackageManager. No PII.
+ * - Returns only package name, app name, and permission list.
  * - BroadcastReceiver is unregistered on module destroy to prevent leaks.
- * - Data is enriched from PackageManager after install, not from the Intent
- *   payload, to ensure consistency.
  */
 class PackageMonitorModule : Module() {
 
@@ -30,31 +26,33 @@ class PackageMonitorModule : Module() {
         Events("onPackageInstalled")
 
         Function("startMonitoring") {
-            val ctx = appContext.reactContext ?: return@Function
-            if (receiver != null) return@Function
-
-            receiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context, intent: Intent) {
-                    val packageName = intent.data?.schemeSpecificPart ?: return
-                    val isUpdate = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
-
-                    val appData = buildAppData(context, packageName, isUpdate)
-                    sendEvent("onPackageInstalled", appData)
+            val ctx = appContext.reactContext
+            if (ctx != null && receiver == null) {
+                receiver = object : BroadcastReceiver() {
+                    override fun onReceive(context: Context, intent: Intent) {
+                        val packageName = intent.data?.schemeSpecificPart ?: return
+                        val isUpdate = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
+                        val appData = buildAppData(context, packageName, isUpdate)
+                        sendEvent("onPackageInstalled", appData)
+                    }
                 }
+                val filter = IntentFilter().apply {
+                    addAction(Intent.ACTION_PACKAGE_ADDED)
+                    addAction(Intent.ACTION_PACKAGE_REPLACED)
+                    addDataScheme("package")
+                }
+                ctx.registerReceiver(receiver, filter)
             }
-
-            val filter = IntentFilter().apply {
-                addAction(Intent.ACTION_PACKAGE_ADDED)
-                addAction(Intent.ACTION_PACKAGE_REPLACED)
-                addDataScheme("package")
-            }
-            ctx.registerReceiver(receiver, filter)
+            null
         }
 
         Function("stopMonitoring") {
-            val ctx = appContext.reactContext ?: return@Function
-            receiver?.let { ctx.unregisterReceiver(it) }
-            receiver = null
+            val ctx = appContext.reactContext
+            if (ctx != null) {
+                receiver?.let { ctx.unregisterReceiver(it) }
+                receiver = null
+            }
+            null
         }
 
         OnDestroy {
@@ -68,22 +66,25 @@ class PackageMonitorModule : Module() {
         return try {
             val pm = context.packageManager
             val info = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-            val appName = try {
-                pm.getApplicationLabel(info.applicationInfo).toString().trim()
-            } catch (_: Exception) {
+            val appInfo = info.applicationInfo
+            val appName = if (appInfo != null) {
+                try { pm.getApplicationLabel(appInfo).toString().trim() } catch (_: Exception) { packageName }
+            } else {
                 packageName
             }
-            val permissions = info.requestedPermissions?.toList() ?: emptyList<String>()
-            val isSystemApp = (info.applicationInfo.flags and
-                android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
-
+            val permissions = info.requestedPermissions?.toList() ?: emptyList()
+            val isSystemApp = if (appInfo != null) {
+                (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+            } else {
+                false
+            }
             mapOf(
                 "packageName" to packageName,
                 "appName" to appName,
                 "permissions" to permissions,
                 "isUpdate" to isUpdate,
                 "isSystemApp" to isSystemApp,
-                "installTime" to (info.firstInstallTime),
+                "installTime" to info.firstInstallTime,
             )
         } catch (_: Exception) {
             mapOf(

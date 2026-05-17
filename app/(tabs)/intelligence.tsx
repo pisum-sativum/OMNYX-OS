@@ -14,27 +14,26 @@ import Animated, {
   withSequence,
   withTiming,
   withSpring,
+  cancelAnimation,
   FadeIn,
   FadeInDown,
   FadeInRight,
 } from 'react-native-reanimated';
 import {
   TrendingUp,
+  TrendingDown,
   Cpu,
   Scan,
   ShieldAlert,
   ShieldCheck,
-  AlertTriangle,
   Lock,
-  Globe,
-  Eye,
   Zap,
-  Activity,
   CheckCircle2,
   RefreshCw,
   Radio,
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 
 import { THEMES } from '@/theme';
 import { useAppStore } from '@store/useAppStore';
@@ -125,6 +124,10 @@ function ScanPulse({ color }: { color: string }) {
       withSequence(withTiming(0, { duration: 850 }), withTiming(0.6, { duration: 0 })),
       -1, false
     );
+    return () => {
+      cancelAnimation(scale);
+      cancelAnimation(opacity);
+    };
   }, []);
 
   const pulseStyle = useAnimatedStyle(() => ({
@@ -562,39 +565,62 @@ function RiskAppList({ themeId }: { themeId: string }) {
 function PrivacyChart({ themeId }: { themeId: string }) {
   const theme = THEMES[themeId as keyof typeof THEMES];
   const C = theme.colors;
+  const privacyScore = useAppStore((s) => s.privacyScore);
+  const scanResult = useAppStore((s) => s.scanResult);
 
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const values = [54, 61, 58, 67, 72, 69, 74];
-  const max = Math.max(...values);
+  const containerStyle = {
+    marginHorizontal: 20, borderRadius: 16, borderWidth: 1,
+    borderColor: C.borderDim, backgroundColor: C.surface1,
+    padding: 16, marginBottom: 12,
+  };
+
+  if (!scanResult) {
+    return (
+      <Animated.View entering={FadeInDown.delay(300).springify()} style={[containerStyle, { alignItems: 'center', paddingVertical: 24 }]}>
+        <TrendingUp size={22} color={C.textDim} strokeWidth={1.5} style={{ marginBottom: 10, opacity: 0.4 }} />
+        <Text style={{ fontSize: 12, fontWeight: '700', color: C.textPrimary, marginBottom: 6 }}>Score Breakdown</Text>
+        <Text style={{ fontSize: 11, color: C.textDim, textAlign: 'center', lineHeight: 16 }}>
+          Run a device scan to see your privacy score breakdown by category.
+        </Text>
+      </Animated.View>
+    );
+  }
+
+  const labels = ['PERM', 'TRKR', 'NET', 'DATA'];
+  const values = [
+    privacyScore.breakdown.permissions,
+    privacyScore.breakdown.trackers,
+    privacyScore.breakdown.networkActivity,
+    privacyScore.breakdown.dataCollection,
+  ];
+  const max = Math.max(...values, 1);
+  const delta = privacyScore.current - privacyScore.previous;
+  const trendColor = delta >= 0 ? C.safe : C.threat;
+  const TrendIcon = delta >= 0 ? TrendingUp : TrendingDown;
 
   return (
-    <Animated.View
-      entering={FadeInDown.delay(300).springify()}
-      style={{
-        marginHorizontal: 20, borderRadius: 16, borderWidth: 1,
-        borderColor: C.borderDim, backgroundColor: C.surface1,
-        padding: 16, marginBottom: 12,
-      }}
-    >
+    <Animated.View entering={FadeInDown.delay(300).springify()} style={containerStyle}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <View>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: C.textPrimary }}>7-Day Privacy Score</Text>
-          <Text style={{ fontSize: 9, color: C.textDim, marginTop: 2, letterSpacing: 1 }}>TREND ANALYSIS</Text>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: C.textPrimary }}>Score Breakdown</Text>
+          <Text style={{ fontSize: 9, color: C.textDim, marginTop: 2, letterSpacing: 1 }}>CATEGORY ANALYSIS</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-          <TrendingUp size={12} color={C.safe} strokeWidth={2.5} />
-          <Text style={{ fontSize: 11, color: C.safe, fontWeight: '700' }}>+20 pts</Text>
+          <TrendIcon size={12} color={trendColor} strokeWidth={2.5} />
+          <Text style={{ fontSize: 11, color: trendColor, fontWeight: '700' }}>
+            {delta >= 0 ? '+' : ''}{delta} pts
+          </Text>
         </View>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 80 }}>
         {values.map((v, i) => (
           <BarItem
-            key={days[i]}
+            key={labels[i]}
             value={v}
             max={max}
             isLatest={i === values.length - 1}
             color={C.primary}
-            day={days[i]}
+            day={labels[i]}
             dimColor={C.textDim}
             index={i}
           />
@@ -609,14 +635,16 @@ function PrivacyChart({ themeId }: { themeId: string }) {
 function QuickActions({ themeId }: { themeId: string }) {
   const theme = THEMES[themeId as keyof typeof THEMES];
   const C = theme.colors;
+  const router = useRouter();
+  const { startScan, isScanning } = usePermissionScan();
 
   const actions = [
-    { label: 'Deep Scan', icon: Eye, color: C.primary, desc: 'Full system scan' },
-    { label: 'Block All', icon: Lock, color: C.threat, desc: 'Block risky apps' },
-    { label: 'VPN Mode', icon: Globe, color: C.safe, desc: 'Secure connection' },
-    { label: 'AI Audit', icon: Cpu, color: C.accent, desc: 'AI analysis' },
-    { label: 'Speed Test', icon: Zap, color: '#FF8C00', desc: 'Network check' },
-    { label: 'Report', icon: Activity, color: '#BF00FF', desc: 'Export report' },
+    { label: 'Rescan', icon: RefreshCw, color: C.primary, desc: 'Permission scan', onPress: startScan, disabled: isScanning },
+    { label: 'Threats', icon: ShieldAlert, color: C.threat, desc: 'Threat feed', onPress: () => router.push('/(tabs)/threat-feed') },
+    { label: 'AI Swarm', icon: Cpu, color: C.accent, desc: 'Agent console', onPress: () => router.push('/(tabs)/agents') },
+    { label: 'Memory', icon: Radio, color: '#FF8C00', desc: 'Signal archive', onPress: () => router.push('/(tabs)/replay') },
+    { label: 'Modes', icon: Lock, color: C.safe, desc: 'Privacy modes', onPress: () => router.push('/(tabs)/modes') },
+    { label: 'Settings', icon: Zap, color: '#BF00FF', desc: 'App settings', onPress: () => router.push('/(tabs)/settings') },
   ];
 
   return (
@@ -638,6 +666,8 @@ function QuickActions({ themeId }: { themeId: string }) {
           return (
             <TouchableOpacity
               key={action.label}
+              onPress={action.onPress}
+              disabled={action.disabled}
               activeOpacity={0.7}
               style={{
                 width: (SCREEN_W - 72) / 3,
@@ -645,6 +675,7 @@ function QuickActions({ themeId }: { themeId: string }) {
                 alignItems: 'center',
                 backgroundColor: `${action.color}0E`,
                 borderWidth: 1, borderColor: `${action.color}28`, gap: 6,
+                opacity: action.disabled ? 0.5 : 1,
               }}
             >
               <View style={{
@@ -671,6 +702,8 @@ function SystemStatus({ themeId }: { themeId: string }) {
   const C = theme.colors;
   const pulseVal = useSharedValue(0.5);
   const scanResult = useAppStore((s) => s.scanResult);
+  const isScanning = useAppStore((s) => s.isScanning);
+  const { isNativeAvailable } = usePermissionScan();
 
   useEffect(() => {
     pulseVal.value = withRepeat(
@@ -680,15 +713,17 @@ function SystemStatus({ themeId }: { themeId: string }) {
       ),
       -1, true
     );
+    return () => cancelAnimation(pulseVal);
   }, []);
 
   const pulseStyle = useAnimatedStyle(() => ({ opacity: pulseVal.value }));
 
+  const scannerLabel = isScanning ? 'Scanning...' : isNativeAvailable ? 'Native · Ready' : 'Simulation · Ready';
   const statuses = [
-    { label: 'AI Engine', value: 'Operational', ok: true },
-    { label: 'Threat Scanner', value: 'Active', ok: true },
-    { label: 'Permission DB', value: '40 entries', ok: true },
-    { label: 'Network Monitor', value: 'Running', ok: true },
+    { label: 'Permission Rules', value: '38 patterns', ok: true },
+    { label: 'Tracker Database', value: '10 signatures', ok: true },
+    { label: 'Scan Engine', value: scannerLabel, ok: true },
+    { label: 'Package Monitor', value: 'Active', ok: true },
     { label: 'Apps Scanned', value: scanResult ? `${scanResult.appCount}` : 'Not yet run', ok: !!scanResult },
     { label: 'Last Scan', value: scanResult ? `${Math.round((Date.now() - scanResult.scannedAt.getTime()) / 1000)}s ago` : 'Never', ok: !!scanResult },
   ];
@@ -797,6 +832,7 @@ function LiveSignalFeed({ themeId }: { themeId: string }) {
   const recentEvents = useAppStore((s) => s.recentEvents);
   const realtimeConnected = useAppStore((s) => s.realtimeConnected);
   const atmosphereLevel = useAppStore((s) => s.atmosphereLevel);
+  const scanResult = useAppStore((s) => s.scanResult);
 
   const displayEvents = recentEvents.slice(0, 6);
 
@@ -815,6 +851,7 @@ function LiveSignalFeed({ themeId }: { themeId: string }) {
       withSequence(withTiming(1, { duration: 800 }), withTiming(0.4, { duration: 800 })),
       -1, true
     );
+    return () => cancelAnimation(signalPulse);
   }, []);
 
   const pulseStyle = useAnimatedStyle(() => ({ opacity: signalPulse.value }));
@@ -855,7 +892,9 @@ function LiveSignalFeed({ themeId }: { themeId: string }) {
 
       {displayEvents.length === 0 ? (
         <View style={{ paddingVertical: 12, alignItems: 'center' }}>
-          <Text style={{ fontSize: 11, color: C.textDim }}>Ambient engine initializing…</Text>
+          <Text style={{ fontSize: 11, color: C.textDim }}>
+            {scanResult ? 'No signals since last scan.' : 'Run a device scan to generate intelligence signals.'}
+          </Text>
         </View>
       ) : (
         displayEvents.map((event, i) => (

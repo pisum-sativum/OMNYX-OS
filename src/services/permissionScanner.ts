@@ -10,7 +10,8 @@
  * - On permission denial or native unavailability, falls back to demo data.
  */
 
-import { NativeModules, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import { requireNativeModule } from 'expo-modules-core';
 import { calculateRiskProfile, calculatePrivacyImpact } from './riskEngine';
 import type { AppRiskProfile, ScanProgress, ScanResult } from '@/types/permissions';
 
@@ -20,7 +21,13 @@ const NativeScanner: {
   scanInstalledApps: () => Promise<NativeAppData[]>;
   hasPermission: () => Promise<boolean>;
 } | null = Platform.OS === 'android'
-  ? (NativeModules.OmnyxPermissionScanner ?? null)
+  ? (() => {
+      try {
+        return requireNativeModule('OmnyxPermissionScanner');
+      } catch {
+        return null;
+      }
+    })()
   : null;
 
 interface NativeAppData {
