@@ -481,7 +481,7 @@ function AppRiskCard({
               })}
             </View>
             {expandedPermission ? (
-              <Text style={{ fontSize: 9, color: C.textPrimary, lineHeight: 13 }}>
+              <Text style={{ fontSize: 11, color: C.textPrimary, lineHeight: 13 }}>
                 {
                   flaggedPermissions.find((p) => p.shortName === expandedPermission)
                     ?.threat
