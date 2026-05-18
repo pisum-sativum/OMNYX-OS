@@ -31,6 +31,7 @@ export interface ScannedApp {
 }
 
 export interface ThreatEvent {
+  title: any;
   id: string;
   appName: string;
   packageName?: string;

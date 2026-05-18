@@ -1,6 +1,8 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Copy, Check } from 'lucide-react-native';
+import * as ExpoClipboard from 'expo-clipboard';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -22,7 +24,7 @@ import {
   Shield,
   ShieldCheck,
 } from 'lucide-react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { THEMES } from '@/theme';
 import { useAppStore } from '@store/useAppStore';
@@ -356,7 +358,7 @@ type FilterId = RiskLevel | 'all';
 export default function ThreatFeedScreen() {
   const { threatEvents, clearUnreadThreats, currentTheme, scanResult } = useAppStore();
   const [filter, setFilter] = useState<FilterId>('all');
-
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const theme = THEMES[currentTheme];
   const C = theme.colors;
 
@@ -375,7 +377,29 @@ export default function ThreatFeedScreen() {
     { id: 'high', label: 'High', color: '#FF7A00' },
     { id: 'medium', label: 'Medium', color: C.accent },
   ];
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleCopyThreat = async (threat: ThreatEvent) => {
+    const text = `[${threat.riskLevel.toUpperCase()}] ${threat.title} — ${threat.description}`;
 
+    await ExpoClipboard.setStringAsync(text);
+
+    if (copyTimerRef.current) {
+      clearTimeout(copyTimerRef.current);
+    }
+
+    setCopiedId(threat.id);
+
+    copyTimerRef.current = setTimeout(() => {
+      setCopiedId(null);
+    }, 1500);
+  };
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <LinearGradient
@@ -472,7 +496,33 @@ export default function ThreatFeedScreen() {
               const isCritical = !item.resolved && item.riskLevel === 'critical';
               return (
                 <ThreatPulseWrapper isCritical={isCritical} riskColor={C.threat}>
-                  <ThreatCard event={item} index={index} themeId={currentTheme} />
+                  <View style={{ position: 'relative' }}>
+                    <ThreatCard event={item} index={index} themeId={currentTheme} />
+
+                    <TouchableOpacity
+                      onPress={() => handleCopyThreat(item)}
+                      activeOpacity={0.7}
+                      style={{
+                        position: 'absolute',
+                        top: 12,
+                        right: 12,
+                        width: 34,
+                        height: 34,
+                        borderRadius: 17,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: C.glass1,
+                        borderWidth: 1,
+                        borderColor: C.borderDim,
+                      }}
+                    >
+                      {copiedId === item.id ? (
+                        <Check size={16} color={C.threat} />
+                      ) : (
+                        <Copy size={16} color={C.textDim} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 </ThreatPulseWrapper>
               );
             }}
