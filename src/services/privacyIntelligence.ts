@@ -120,12 +120,13 @@ export function buildThreatEvents(scanResult: ScanResult): ThreatEvent[] {
 
     events.push({
       id: genId('perm'),
+      title: topPattern?.label ?? `${app.appName} — Suspicious Permission Profile`,
       appName: app.appName,
       packageName: app.packageName,
       eventType: 'suspicious_permission',
       riskLevel: app.riskTier === 'critical' ? 'critical' : 'high',
       description,
-      timestamp: new Date(now.getTime() - Math.random() * 300000), // within last 5 min
+      timestamp: new Date(now.getTime() - Math.random() * 300000),
       resolved: false,
     });
   }
@@ -147,6 +148,7 @@ export function buildThreatEvents(scanResult: ScanResult): ThreatEvent[] {
 
     events.push({
       id: genId('track'),
+      title: knownRisk?.label ?? topMatch?.pattern.name ?? `${result.appName} — Tracker Signature`,
       appName: result.appName,
       packageName: result.packageName,
       eventType: 'tracker_detected',
@@ -291,6 +293,7 @@ export function buildInstallThreatEvent(profile: Omit<AppRiskProfile, 'id'> & { 
 
   return {
     id: genId('install'),
+    title: topPattern?.label ?? `${profile.appName} — New Install Risk`,
     appName: profile.appName,
     packageName: profile.packageName,
     eventType: profile.threatPatterns.length > 0 ? 'suspicious_permission' : 'tracker_detected',
