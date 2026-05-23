@@ -105,7 +105,7 @@ function WaveformPanel({ themeId }: { themeId: string }) {
         {scanResult ? 'SCORE TREND' : 'SCORE TRACE'}
       </Text>
       <View style={{
-        backgroundColor: C.surface1, borderRadius: 18, padding: CHART_PAD,
+        backgroundColor: C.surface1, borderRadius: 16, padding: CHART_PAD,
         borderWidth: 1, borderColor: C.borderDim, overflow: 'hidden',
       }}>
         <View style={{ height: CHART_H }}>

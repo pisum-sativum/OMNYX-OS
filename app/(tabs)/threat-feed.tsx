@@ -123,7 +123,7 @@ function ThreatCard({
     <Animated.View
       entering={FadeInDown.delay(index * 60).springify()}
       style={{
-        borderRadius: 18,
+        borderRadius: 16,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: event.resolved ? C.borderDim : `${riskColor}28`,
@@ -323,7 +323,7 @@ function ThreatPulseWrapper({
       {isCritical && (
         <Animated.View style={[{
           position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          borderRadius: 18, borderWidth: 1.5, borderColor: riskColor,
+          borderRadius: 16, borderWidth: 1.5, borderColor: riskColor,
           shadowColor: riskColor, shadowOffset: { width: 0, height: 0 },
           shadowRadius: 14, shadowOpacity: 1,
         }, glowStyle]} />

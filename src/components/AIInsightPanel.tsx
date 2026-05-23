@@ -32,7 +32,7 @@ export function AIInsightPanel({ threat, C }: AIInsightPanelProps) {
         activeOpacity={0.7}
         style={{
           flexDirection: 'row', alignItems: 'center', gap: 8,
-          paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10,
+          paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16,
           backgroundColor: `${C.primary}0C`,
           borderWidth: 1, borderColor: `${C.primary}25`,
           alignSelf: 'flex-start',

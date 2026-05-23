@@ -351,7 +351,7 @@ function ThemeSwitcher({
       <View
         style={{
           backgroundColor: C.surface1,
-          borderRadius: 18,
+          borderRadius: 16,
           borderWidth: 1,
           borderColor: C.borderDim,
           overflow: 'hidden',
@@ -606,7 +606,7 @@ export default function ModesScreen() {
             style={{
               marginHorizontal: 20,
               backgroundColor: C.surface1,
-              borderRadius: 18,
+              borderRadius: 16,
               borderWidth: 1,
               borderColor: C.borderDim,
               overflow: 'hidden',

@@ -80,7 +80,7 @@ function Section({
         style={{
           marginHorizontal: 20,
           backgroundColor: C.surface1,
-          borderRadius: 18,
+          borderRadius: 16,
           borderWidth: 1,
           borderColor: C.borderDim,
           overflow: 'hidden',
@@ -197,7 +197,7 @@ function ThemeSwitcher({ currentTheme, onSelect, C }: {
       </Text>
       <View style={{
         backgroundColor: C.surface1,
-        borderRadius: 18,
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: C.borderDim,
         overflow: 'hidden',

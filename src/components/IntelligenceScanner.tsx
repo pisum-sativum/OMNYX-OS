@@ -75,7 +75,7 @@ export function IntelligenceScanner({ primary, phaseIndex }: IntelligenceScanner
       {/* Agent label + phase text + blinking cursor */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 11 }}>
         <View style={{
-          paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5,
+          paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6,
           backgroundColor: `${agentColor}18`, borderWidth: 1, borderColor: `${agentColor}35`,
         }}>
           <Text style={{ fontSize: 8, fontWeight: '800', color: agentColor, letterSpacing: 1.5 }}>

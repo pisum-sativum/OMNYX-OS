@@ -349,7 +349,7 @@ function ThemePicker({ visible, currentTheme, onSelect, onClose }: {
         activeOpacity={1}
         onPress={() => {}}
         style={{
-          backgroundColor: C.surface1, borderRadius: 18, borderWidth: 1, borderColor: C.border,
+          backgroundColor: C.surface1, borderRadius: 16, borderWidth: 1, borderColor: C.border,
           overflow: 'hidden', minWidth: 220,
         }}
       >
@@ -676,7 +676,7 @@ function PrivacyCoachBar({ C }: { C: any }) {
         marginHorizontal: 20, marginBottom: 12,
         flexDirection: 'row', alignItems: 'center', gap: 10,
         paddingHorizontal: 14, paddingVertical: 10,
-        borderRadius: 12,
+        borderRadius: 16,
         backgroundColor: C.glass1,
         borderWidth: 1, borderColor: C.borderDim,
         borderLeftWidth: 3, borderLeftColor: C.safe,
@@ -900,7 +900,7 @@ function PrivacyModePanel({ themeId }: { themeId: ThemeId }) {
         key={privacyMode}
         entering={FadeIn.duration(220)}
         style={{
-          borderRadius: 12, padding: 13,
+          borderRadius: 16, padding: 13,
           backgroundColor: `${activeConfig.color}0D`,
           borderWidth: 1, borderColor: `${activeConfig.color}2A`,
         }}

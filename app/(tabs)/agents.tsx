@@ -11,7 +11,7 @@ import Animated, {
   cancelAnimation,
   FadeInDown,
 } from 'react-native-reanimated';
-import { Shield, Wifi, Brain, Zap, Activity } from 'lucide-react-native';
+import { Shield, Wifi, Brain, Zap, Activity, Cpu } from 'lucide-react-native';
 import { useEffect } from 'react';
 
 import { THEMES } from '@/theme';
@@ -141,6 +141,19 @@ function SwarmDot({ x, y, agent, C }: { x: number; y: number; agent: AIAgent; C:
 
 function SwarmField({ agents, themeId }: { agents: AIAgent[]; themeId: string }) {
   const C = THEMES[themeId as keyof typeof THEMES].colors;
+  if (agents.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <Cpu color={C.textSecondary} size={32} />
+        <Text style={{ color: C.textSecondary, fontSize: 18, marginTop: 8, fontWeight: 'bold' }}>
+          AI Swarm Offline
+        </Text>
+        <Text style={{ color: C.textDim, fontSize: 14, marginTop: 4, textAlign: 'center' }}>
+          Agents are initializing. Try restarting the app.
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ marginHorizontal: 20, marginBottom: 20 }}>
@@ -258,7 +271,7 @@ function AgentCard({ agent, index, themeId }: { agent: AIAgent; index: number; t
     <Animated.View
       entering={FadeInDown.delay(index * 90).springify()}
       style={{
-        marginHorizontal: 20, marginBottom: 12, borderRadius: 18,
+        marginHorizontal: 20, marginBottom: 12, borderRadius: 16,
         borderWidth: 1, borderColor: `${agent.color}22`,
         overflow: 'hidden', backgroundColor: C.surface1,
       }}
