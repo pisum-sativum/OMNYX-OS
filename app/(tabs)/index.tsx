@@ -8,6 +8,8 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Share2 } from 'lucide-react-native';
+import { Share } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -81,20 +83,20 @@ const SEVERITY_COLORS: Record<string, string> = {
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
 
 const RING_CONFIGS: Record<ThemeId, { size: number; stroke: number }> = {
-  nebula:     { size: SCREEN_W * 0.60, stroke: 11 },
-  lumina:     { size: SCREEN_W * 0.54, stroke: 5  },
-  terminal:   { size: SCREEN_W * 0.60, stroke: 10 },
-  solaris:    { size: SCREEN_W * 0.60, stroke: 11 },
-  glassmorph: { size: SCREEN_W * 0.60, stroke: 7  },
+  nebula: { size: SCREEN_W * 0.60, stroke: 11 },
+  lumina: { size: SCREEN_W * 0.54, stroke: 5 },
+  terminal: { size: SCREEN_W * 0.60, stroke: 10 },
+  solaris: { size: SCREEN_W * 0.60, stroke: 11 },
+  glassmorph: { size: SCREEN_W * 0.60, stroke: 7 },
 };
 
 // Agent display names mapped by iconKey
 const AGENT_DISPLAY: Record<string, string> = {
   'shield-alert': 'SENTINEL',
-  network:        'SCOUT',
-  brain:          'ANALYST',
-  zap:            'GUARDIAN',
-  activity:       'WATCHER',
+  network: 'SCOUT',
+  brain: 'ANALYST',
+  zap: 'GUARDIAN',
+  activity: 'WATCHER',
 };
 
 const NEBULA_STARS = Array.from({ length: 60 }, (_, i) => ({
@@ -316,12 +318,12 @@ function LuminaBg() {
 
 function AmbientBackground({ themeId }: { themeId: ThemeId }) {
   switch (themeId) {
-    case 'nebula':     return <NebulaBg />;
-    case 'terminal':   return <TerminalBg />;
+    case 'nebula': return <NebulaBg />;
+    case 'terminal': return <TerminalBg />;
     case 'glassmorph': return <GlassmorphBg />;
-    case 'solaris':    return <SolarisBg />;
-    case 'lumina':     return <LuminaBg />;
-    default:           return null;
+    case 'solaris': return <SolarisBg />;
+    case 'lumina': return <LuminaBg />;
+    default: return null;
   }
 }
 
@@ -347,7 +349,7 @@ function ThemePicker({ visible, currentTheme, onSelect, onClose }: {
     >
       <TouchableOpacity
         activeOpacity={1}
-        onPress={() => {}}
+        onPress={() => { }}
         style={{
           backgroundColor: C.surface1, borderRadius: 16, borderWidth: 1, borderColor: C.border,
           overflow: 'hidden', minWidth: 220,
@@ -398,7 +400,7 @@ function OrbitalRingSystem({ C, themeId }: { C: any; themeId: ThemeId }) {
   const dot2Style = useAnimatedStyle(() => ({ transform: [{ rotate: `${rot2.value}deg` }] }));
 
   const isTerminal = themeId === 'terminal';
-  const isLumina   = themeId === 'lumina';
+  const isLumina = themeId === 'lumina';
 
   // Orbital radii - outer ring, inner ring
   const W = SCREEN_W;
@@ -504,6 +506,15 @@ function ScoreRing({ score, themeId }: { score: number; themeId: ThemeId }) {
   const glowId = `glow_${themeId}`;
   const ringId = `ring_${themeId}`;
 
+
+
+  const onShareScore = async () => {
+    try {
+      await Share.share({
+        message: `My OMNYX Privacy Score is ${score}/100. AI-powered device privacy analysis. github.com/OMNYX-OS/OMNYX-OS`,
+      });
+   } catch {}
+  };
   useEffect(() => {
     const pd = PULSE_DURATIONS[atmosphereLevel];
     pulse.value = withRepeat(
@@ -532,13 +543,13 @@ function ScoreRing({ score, themeId }: { score: number; themeId: ThemeId }) {
       <Svg width={SVG_SIZE} height={SVG_SIZE} style={{ position: 'absolute' }}>
         <Defs>
           <SvgRadialGradient id={glowId} cx="50%" cy="50%" r="50%">
-            <Stop offset="0%"   stopColor={modeGlow} stopOpacity={themeId === 'nebula' ? '0.28' : '0.16'} />
-            <Stop offset="55%"  stopColor={modeGlow} stopOpacity="0.05" />
+            <Stop offset="0%" stopColor={modeGlow} stopOpacity={themeId === 'nebula' ? '0.28' : '0.16'} />
+            <Stop offset="55%" stopColor={modeGlow} stopOpacity="0.05" />
             <Stop offset="100%" stopColor={modeGlow} stopOpacity="0" />
           </SvgRadialGradient>
           <SvgLinearGradient id={ringId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%"   stopColor={C.primaryGlow} stopOpacity="1" />
-            <Stop offset="100%" stopColor={modeGlow}       stopOpacity="1" />
+            <Stop offset="0%" stopColor={C.primaryGlow} stopOpacity="1" />
+            <Stop offset="100%" stopColor={modeGlow} stopOpacity="1" />
           </SvgLinearGradient>
         </Defs>
         <Circle cx={CENTER} cy={CENTER} r={RING_RADIUS + extraGlow} fill={`url(#${glowId})`} />
@@ -577,6 +588,8 @@ function ScoreRing({ score, themeId }: { score: number; themeId: ThemeId }) {
 
       {/* Center text */}
       <View style={{ alignItems: 'center' }}>
+
+        {/* Score */}
         <Text style={{
           fontSize: 64,
           fontWeight: '900',
@@ -586,19 +599,50 @@ function ScoreRing({ score, themeId }: { score: number; themeId: ThemeId }) {
         }}>
           {score}
         </Text>
+
+        {/* Badge */}
         <View style={{
-          paddingHorizontal: 14, paddingVertical: 4,
-          borderRadius: 20, marginTop: 4,
+          paddingHorizontal: 14,
+          paddingVertical: 4,
+          borderRadius: 20,
+          marginTop: 4,
           backgroundColor: `${C.primary}1A`,
-          borderWidth: 1, borderColor: `${C.primary}38`,
+          borderWidth: 1,
+          borderColor: `${C.primary}38`,
         }}>
           <Text style={{ fontSize: 10, fontWeight: '700', color: C.primary, letterSpacing: 2 }}>
             {scoreLabel(score)}
           </Text>
         </View>
-        <Text style={{ fontSize: 9, color: C.textDim, marginTop: 6, letterSpacing: 2 }}>
-          PRIVACY SCORE
-        </Text>
+
+        {/* Label + Share row */}
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: 6,
+        }}>
+          <Text style={{
+            fontSize: 9,
+            color: C.textDim,
+            letterSpacing: 2,
+          }}>
+            PRIVACY SCORE
+          </Text>
+
+          <TouchableOpacity
+            onPress={onShareScore}
+            style={{
+              marginLeft: 6,
+              padding: 4,
+              borderRadius: 999,
+              backgroundColor: `${C.primary}1A`,
+              borderWidth: 1,
+              borderColor: `${C.primary}38`,
+            }}
+          >
+            <Share2 size={12} color={C.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -711,13 +755,13 @@ function ThreatCounts({ themeId }: { themeId: ThemeId }) {
   const router = useRouter();
 
   const critical = threatEvents.filter((e) => e.riskLevel === 'critical' && !e.resolved).length;
-  const high     = threatEvents.filter((e) => e.riskLevel === 'high'     && !e.resolved).length;
-  const medium   = threatEvents.filter((e) => e.riskLevel === 'medium'   && !e.resolved).length;
+  const high = threatEvents.filter((e) => e.riskLevel === 'high' && !e.resolved).length;
+  const medium = threatEvents.filter((e) => e.riskLevel === 'medium' && !e.resolved).length;
 
   const items = [
     { label: 'CRITICAL', count: critical, color: C.threat },
-    { label: 'HIGH',     count: high,     color: '#FF7A00' },
-    { label: 'MEDIUM',   count: medium,   color: C.accent  },
+    { label: 'HIGH', count: high, color: '#FF7A00' },
+    { label: 'MEDIUM', count: medium, color: C.accent },
   ];
 
   return (
@@ -1178,8 +1222,8 @@ export default function HomeScreen() {
 
   const trend =
     privacyScore.current > privacyScore.previous ? 'improving'
-    : privacyScore.current < privacyScore.previous ? 'declining'
-    : 'stable';
+      : privacyScore.current < privacyScore.previous ? 'declining'
+        : 'stable';
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
