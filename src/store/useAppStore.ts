@@ -35,6 +35,7 @@ interface AppState {
   threatEvents: ThreatEvent[];
   addThreatEvent: (event: ThreatEvent) => void;
   resolveThreat: (id: string) => void;
+  resolveAllThreats: () => void;
   unreadThreatCount: number;
   clearUnreadThreats: () => void;
 
@@ -97,6 +98,14 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set, get) =
         e.id === id ? { ...e, resolved: true } : e
       ),
     })),
+  resolveAllThreats: () =>
+  set((state) => ({
+    threatEvents: state.threatEvents.map((event) => ({
+      ...event,
+      resolved: true,
+    })),
+    unreadThreatCount: 0,
+  })),
   unreadThreatCount: 0,
   clearUnreadThreats: () => set({ unreadThreatCount: 0 }),
 

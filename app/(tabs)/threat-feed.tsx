@@ -356,7 +356,7 @@ function EmptyState({ hasScanned, C }: { hasScanned: boolean; C: any }) {
 type FilterId = RiskLevel | 'all';
 
 export default function ThreatFeedScreen() {
-  const { threatEvents, clearUnreadThreats, currentTheme, scanResult } = useAppStore();
+  const { threatEvents, clearUnreadThreats, currentTheme, scanResult, resolveAllThreats } = useAppStore();
   const [filter, setFilter] = useState<FilterId>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const theme = THEMES[currentTheme];
@@ -486,6 +486,31 @@ export default function ThreatFeedScreen() {
           </View>
         </View>
 
+        {!filtered.every(event => event.resolved) && <TouchableOpacity
+          onPress={resolveAllThreats}
+          activeOpacity={0.7}
+          disabled={filtered.every((event) => event.resolved === true)}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginHorizontal: 24,
+            marginBottom: 8,
+            gap: 6,
+            alignSelf: 'flex-end',
+            paddingHorizontal: 14,
+            paddingVertical: 8,
+            borderRadius: 10,
+            backgroundColor: `${C.primary}12`,
+            borderWidth: 1,
+            borderColor: `${C.primary}30`,
+          }}
+        >
+          <Shield size={12} color={C.primary} />
+          <Text style={{ fontSize: 11, color: C.primary, fontWeight: '600' }}>
+            Mark All Resolved
+          </Text>
+        </TouchableOpacity>}
+       
         {filtered.length === 0 ? (
           <EmptyState hasScanned={scanResult !== null} C={C} />
         ) : (
