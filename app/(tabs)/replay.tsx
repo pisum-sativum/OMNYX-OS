@@ -37,8 +37,8 @@ const RISK_COLOR: Record<string, string> = {
   safe: '#00FF88',
 };
 
-function ts(d: Date) {
-  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+function ts(d: Date, timeFormat: '12h' | '24h') {
+  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: timeFormat === '12h'});
 }
 
 function buildPath(pts: Array<{ x: number; y: number }>) {
@@ -145,11 +145,13 @@ export function MemoryNode({
   index,
   isLast,
   themeId,
+  timeFormat,
 }: {
   event: ReplayEvent;
   index: number;
   isLast: boolean;
   themeId: string;
+  timeFormat: '12h' | '24h';
 }) {
   const C = THEMES[themeId as keyof typeof THEMES].colors;
   const isPositive = event.riskChange < 0;
@@ -233,7 +235,7 @@ export function MemoryNode({
                 {event.riskLevel.toUpperCase()}
               </Text>
             </View>
-            <Text style={{ fontSize: 10, color: C.textDim, flex: 1 }}>{ts(event.timestamp)}</Text>
+            <Text style={{ fontSize: 10, color: C.textDim, flex: 1 }}>{ts(event.timestamp, timeFormat)}</Text>
             <View style={{
               flexDirection: 'row', alignItems: 'center', gap: 3,
               paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5,
@@ -282,7 +284,7 @@ export function MemoryNode({
 // ─── Screen ────────────────────────────────────────────────────────────────────
 
 export default function ReplayScreen() {
-  const { replayEvents, currentTheme } = useAppStore();
+  const { replayEvents, currentTheme, timeFormat } = useAppStore();
   const C = THEMES[currentTheme].colors;
 
   return (
@@ -316,6 +318,7 @@ export default function ReplayScreen() {
               index={i}
               isLast={i === replayEvents.length - 1}
               themeId={currentTheme}
+              timeFormat={timeFormat}
             />
           ))}
           <View style={{ alignItems: 'center', marginTop: 12 }}>

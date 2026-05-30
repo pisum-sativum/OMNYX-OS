@@ -32,6 +32,9 @@ interface AppState {
   privacyMode: PrivacyMode;
   setPrivacyMode: (mode: PrivacyMode) => void;
 
+  timeFormat: '12h' | '24h';
+  setTimeFormat: (format: '12h' | '24h') => void;
+
   threatEvents: ThreatEvent[];
   addThreatEvent: (event: ThreatEvent) => void;
   resolveThreat: (id: string) => void;
@@ -85,6 +88,9 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set, get) =
 
   privacyMode: 'normal',
   setPrivacyMode: (mode) => set({ privacyMode: mode }),
+
+  timeFormat: '24h',
+  setTimeFormat: (format) => set({ timeFormat: format }),
 
   threatEvents: [],
   addThreatEvent: (event) =>

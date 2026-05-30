@@ -53,12 +53,15 @@ const EVENT_LABELS: Record<ThreatEventType, string> = {
   background_activity: 'Background Activity',
 };
 
-function timeAgo(date: Date): string {
-  const diff = Date.now() - date.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  return `${Math.floor(mins / 60)}h ago`;
+function formatTime(
+  date: Date,
+  timeFormat: '12h' | '24h'
+): string {
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: timeFormat === '12h',
+  });
 }
 
 function LiveIndicator({ color }: { color: string }) {
@@ -100,10 +103,12 @@ function ThreatCard({
   event,
   index,
   themeId,
+  timeFormat,
 }: {
   event: ThreatEvent;
   index: number;
   themeId: string;
+  timeFormat: '12h' | '24h';
 }) {
   const theme = THEMES[themeId as keyof typeof THEMES];
   const C = theme.colors;
@@ -158,7 +163,7 @@ function ThreatCard({
               {event.appName}
             </Text>
             <Text style={{ fontSize: 10, color: C.textDim, marginTop: 2, letterSpacing: 0.3 }}>
-              {EVENT_LABELS[event.eventType]} · {timeAgo(event.timestamp)}
+              {EVENT_LABELS[event.eventType]} · {formatTime(event.timestamp, timeFormat)}
             </Text>
           </View>
 
@@ -356,7 +361,7 @@ function EmptyState({ hasScanned, C }: { hasScanned: boolean; C: any }) {
 type FilterId = RiskLevel | 'all';
 
 export default function ThreatFeedScreen() {
-  const { threatEvents, clearUnreadThreats, currentTheme, scanResult, resolveAllThreats } = useAppStore();
+  const { threatEvents, clearUnreadThreats, currentTheme, scanResult, resolveAllThreats, timeFormat} = useAppStore();
   const [filter, setFilter] = useState<FilterId>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const theme = THEMES[currentTheme];
@@ -522,7 +527,7 @@ export default function ThreatFeedScreen() {
               return (
                 <ThreatPulseWrapper isCritical={isCritical} riskColor={C.threat}>
                   <View style={{ position: 'relative' }}>
-                    <ThreatCard event={item} index={index} themeId={currentTheme} />
+                    <ThreatCard event={item} index={index} themeId={currentTheme} timeFormat={timeFormat} />
 
                     <TouchableOpacity
                       onPress={() => handleCopyThreat(item)}
