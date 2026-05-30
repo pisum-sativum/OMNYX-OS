@@ -1,0 +1,91 @@
+language: "en-US"
+tone_instructions: "Be direct and specific. No filler phrases. Flag real issues only — skip style nitpicks unless they break a project rule."
+early_access: false
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: true
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+
+  path_instructions:
+    - path: "**/*.tsx"
+      instructions: |
+        OMNYX is a React Native / Expo app. Enforce these rules on every TSX file:
+
+        COLORS — No hardcoded color values anywhere. This means no hex strings (#FFFFFF, #000, etc), no rgb(), no named colors ('white', 'black', 'red'). All colors must come from the active theme via `const C = THEMES[themeId].colors` and referenced as `C.primary`, `C.background`, `C.textPrimary`, etc. Flag any hardcoded color as a blocking issue.
+
+        STORE — Always use `useAppStore` from `@store/useAppStore`. Never `useStore`, `useZustandStore`, or any other name. Flag wrong store hook names.
+
+        REANIMATED — Any component that uses `useSharedValue`, `withTiming`, `withSpring`, or `withRepeat` must call `cancelAnimation()` on all shared values inside a `useEffect` cleanup. Flag missing cleanup.
+
+        GESTURES — Gesture objects created with `Gesture.Pan()`, `Gesture.Tap()`, etc. must be wrapped in `useMemo`. If `switchTheme`, `handlePress`, or similar callbacks are used inside a gesture, they must be wrapped in `useCallback` first. Flag gesture objects created inline without `useMemo`.
+
+        SCOPE — If the PR fixes a specific issue, changes must be limited to that scope. Flag any modifications to unrelated components or functions.
+
+        NO CONSOLE — No `console.log`, `console.warn`, or `console.error` in production code paths.
+
+        NO ANY — No `any` type without a comment explaining why it is unavoidable.
+
+    - path: "**/*.ts"
+      instructions: |
+        OMNYX TypeScript rules:
+
+        STORE — All store actions must be pure state updates using `set()`. Side effects (haptics, navigation, analytics) are acceptable inside actions only if they are fire-and-forget and do not block the state update.
+
+        TYPES — No `any` without justification. Type all function parameters and return values. Prefer explicit union types over broad primitives.
+
+        SERVICES — Functions in `src/services/` must not import from `src/components/` or `app/`. Only upward imports are allowed.
+
+        NO CONSOLE — No `console.log` in production code.
+
+    - path: "src/store/useAppStore.ts"
+      instructions: |
+        This is the single global Zustand store. Every change here affects the entire app.
+
+        Check that new state fields have a matching action (setter).
+        Check that new actions follow the existing `set()` pattern.
+        Check that no action introduces a Promise that is awaited inside `set()`.
+        Flag any import of UI components or screen files.
+
+    - path: "app/(tabs)/*.tsx"
+      instructions: |
+        These are the core tab screens. In addition to the general TSX rules:
+
+        Check that any new component defined in a screen file is either small (under ~40 lines) or extracted into `src/components/`.
+        Check that FlatList `renderItem` functions are not defined inline — they should be extracted to a named component or `useCallback`.
+        Check that all `Animated.View` / `useAnimatedStyle` usages have corresponding `cancelAnimation` cleanup.
+
+    - path: "src/services/**/*.ts"
+      instructions: |
+        Service files must have no React or React Native imports.
+        Functions that build ThreatEvent, ReplayEvent, or OmnyxEvent objects must populate all required fields — id, title, riskLevel, description, timestamp, resolved.
+        Flag any function that returns an event object missing the `title` field.
+
+    - path: "**/__tests__/**/*.ts"
+      instructions: |
+        Test files must use real type fixtures that match the actual TypeScript interfaces.
+        Check that mock objects include all required fields from the interface.
+        Flag any test that only checks `toBeTruthy()` without asserting a specific value — these are weak tests.
+
+    - path: "**/__tests__/**/*.tsx"
+      instructions: |
+        Component test files must mock all native modules (react-native-reanimated, react-native-gesture-handler, expo-*, react-native-svg).
+        Check that mocks use `require('react-native').View` as fallback components, not JSX.
+        Flag any test that imports from the store without mocking it.
+
+    - path: "package.json"
+      instructions: |
+        Check that any new dependency is added with `npx expo install` version ranges (~ prefix), not exact versions or ^ ranges, to stay compatible with Expo SDK 54.
+        Flag dependencies added to `dependencies` that should be `devDependencies` (jest, ts-jest, @types/*, testing libraries).
+
+chat:
+  auto_reply: true
