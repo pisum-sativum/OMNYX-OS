@@ -140,7 +140,7 @@ function WaveformPanel({ themeId }: { themeId: string }) {
 
 // ─── Memory Node ────────────────────────────────────────────────────────────────
 
-function MemoryNode({
+export function MemoryNode({
   event,
   index,
   isLast,
