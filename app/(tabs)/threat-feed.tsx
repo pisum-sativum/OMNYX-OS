@@ -361,7 +361,7 @@ function EmptyState({ hasScanned, C }: { hasScanned: boolean; C: any }) {
 type FilterId = RiskLevel | 'all';
 
 export default function ThreatFeedScreen() {
-  const { threatEvents, clearUnreadThreats, currentTheme, scanResult, resolveAllThreats, timeFormat} = useAppStore();
+  const { threatEvents, clearUnreadThreats, currentTheme, scanResult, resolveAllThreats, timeFormat, resolveThreat } = useAppStore();
   const [filter, setFilter] = useState<FilterId>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const theme = THEMES[currentTheme];
@@ -432,23 +432,49 @@ export default function ThreatFeedScreen() {
             >
               THREATS
             </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 7,
-                backgroundColor: `${C.threat}12`,
-                paddingHorizontal: 12,
-                paddingVertical: 7,
-                borderRadius: 24,
-                borderWidth: 1,
-                borderColor: `${C.threat}35`,
-              }}
-            >
-              <LiveIndicator color={C.threat} />
-              <Text style={{ fontSize: 10, color: C.threat, fontWeight: '700', letterSpacing: 1.5 }}>
-                LIVE
-              </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              {activeCount > 0 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    resolveAllThreats();
+                    clearUnreadThreats();
+                  }}
+                  activeOpacity={0.7}
+                  style={{
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      color: C.textDim,
+                      fontWeight: '600',
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    Resolve All
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 7,
+                  backgroundColor: `${C.threat}12`,
+                  paddingHorizontal: 12,
+                  paddingVertical: 7,
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: `${C.threat}35`,
+                }}
+              >
+                <LiveIndicator color={C.threat} />
+                <Text style={{ fontSize: 10, color: C.threat, fontWeight: '700', letterSpacing: 1.5 }}>
+                  LIVE
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -491,31 +517,7 @@ export default function ThreatFeedScreen() {
           </View>
         </View>
 
-        {!filtered.every(event => event.resolved) && <TouchableOpacity
-          onPress={resolveAllThreats}
-          activeOpacity={0.7}
-          disabled={filtered.every((event) => event.resolved === true)}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginHorizontal: 24,
-            marginBottom: 8,
-            gap: 6,
-            alignSelf: 'flex-end',
-            paddingHorizontal: 14,
-            paddingVertical: 8,
-            borderRadius: 10,
-            backgroundColor: `${C.primary}12`,
-            borderWidth: 1,
-            borderColor: `${C.primary}30`,
-          }}
-        >
-          <Shield size={12} color={C.primary} />
-          <Text style={{ fontSize: 11, color: C.primary, fontWeight: '600' }}>
-            Mark All Resolved
-          </Text>
-        </TouchableOpacity>}
-        
+
         {filtered.length === 0 ? (
           <EmptyState hasScanned={scanResult !== null} C={C} />
         ) : (

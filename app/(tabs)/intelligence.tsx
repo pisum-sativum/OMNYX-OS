@@ -515,119 +515,14 @@ function AppRiskCard({
   );
 }
 
-function RiskAppListSkeleton({ themeId }: { themeId: string }) {
-  const theme = THEMES[themeId as keyof typeof THEMES];
-  const C = theme.colors;
-  const pulse = useSharedValue(0.3);
-
-  useEffect(() => {
-    pulse.value = withRepeat(withTiming(0.8, { duration: 900 }), -1, true);
-    return () => cancelAnimation(pulse);
-  }, []);
-
-  const pulseStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
-  const rows = Array.from({ length: 4 });
-
-  return (
-    <Animated.View
-      entering={FadeInDown.delay(200).springify()}
-      style={{
-        marginHorizontal: 20, borderRadius: 16,
-        borderWidth: 1, borderColor: C.borderDim,
-        backgroundColor: C.surface1, padding: 16, marginBottom: 12,
-      }}
-    >
-      <View style={{
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14,
-      }}>
-        <Animated.View style={[{ gap: 6 }, pulseStyle]}>
-          <View style={{
-            width: 92, height: 10, borderRadius: 5,
-            backgroundColor: C.borderDim,
-          }} />
-          <View style={{
-            width: 128, height: 8, borderRadius: 4,
-            backgroundColor: C.borderDim,
-          }} />
-        </Animated.View>
-        <Animated.View style={[{
-          width: 54, height: 10, borderRadius: 5,
-          backgroundColor: C.borderDim,
-        }, pulseStyle]} />
-      </View>
-
-      {rows.map((_, i) => (
-        <Animated.View
-          key={`skeleton-${i}`}
-          style={[{
-            flexDirection: 'row', alignItems: 'center',
-            paddingVertical: 12,
-            borderBottomWidth: i < rows.length - 1 ? 1 : 0,
-            borderBottomColor: C.borderDim,
-            gap: 12,
-          }, pulseStyle]}
-        >
-          <View style={{ width: 18, alignItems: 'flex-end' }}>
-            <View style={{
-              width: 12, height: 10, borderRadius: 4,
-              backgroundColor: C.borderDim,
-            }} />
-          </View>
-          <View style={{
-            width: 38, height: 38, borderRadius: 10,
-            backgroundColor: C.borderDim,
-          }} />
-          <View style={{ flex: 1, gap: 6 }}>
-            <View style={{
-              width: '72%', height: 12, borderRadius: 6,
-              backgroundColor: C.borderDim,
-            }} />
-            <View style={{
-              width: '54%', height: 8, borderRadius: 4,
-              backgroundColor: C.borderDim,
-            }} />
-            <View style={{ flexDirection: 'row', gap: 6 }}>
-              <View style={{
-                width: 34, height: 8, borderRadius: 4,
-                backgroundColor: C.borderDim,
-              }} />
-              <View style={{
-                width: 34, height: 8, borderRadius: 4,
-                backgroundColor: C.borderDim,
-              }} />
-              <View style={{
-                width: 34, height: 8, borderRadius: 4,
-                backgroundColor: C.borderDim,
-              }} />
-            </View>
-          </View>
-          <View style={{ alignItems: 'flex-end', gap: 6 }}>
-            <View style={{
-              width: 28, height: 16, borderRadius: 6,
-              backgroundColor: C.borderDim,
-            }} />
-            <View style={{
-              width: 40, height: 10, borderRadius: 5,
-              backgroundColor: C.borderDim,
-            }} />
-          </View>
-        </Animated.View>
-      ))}
-    </Animated.View>
-  );
-}
-
 function RiskAppList({ themeId }: { themeId: string }) {
   const theme = THEMES[themeId as keyof typeof THEMES];
   const C = theme.colors;
   const scanResult = useAppStore((s) => s.scanResult);
-  const isScanning = useAppStore((s) => s.isScanning);
 
   const topApps = scanResult
     ? scanResult.profiles.slice(0, 8)
     : [];
-
-  if (isScanning) return <RiskAppListSkeleton themeId={themeId} />;
   if (topApps.length === 0) return null;
 
   return (
