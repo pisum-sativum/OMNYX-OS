@@ -1,4 +1,4 @@
-import { View, ScrollView, Text, Dimensions, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, Dimensions, RefreshControl, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -337,14 +337,21 @@ export default function ReplayScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 120 }}
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={C.primary}
-              colors={[C.primary]}
-            />
+            Platform.OS !== 'web' ? (
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={C.primary}
+                colors={[C.primary]}
+              />
+            ) : undefined
           }
         >
+          {Platform.OS === 'web' && refreshing && (
+            <View style={{ alignItems: 'center', paddingVertical: 12 }}>
+              <ActivityIndicator size="small" color={C.primary} />
+            </View>
+          )}
           <WaveformPanel themeId={currentTheme} />
           <Text style={{
             fontSize: 10, letterSpacing: 2.5, color: C.textDim,
