@@ -1,4 +1,4 @@
-import { View, ScrollView, Text, Dimensions } from 'react-native';
+import { View, ScrollView, Text, Dimensions, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -11,7 +11,7 @@ import Animated, {
   cancelAnimation,
 } from 'react-native-reanimated';
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react-native';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Svg, {
   Path,
   Circle,
@@ -286,6 +286,18 @@ export function MemoryNode({
 export default function ReplayScreen() {
   const { replayEvents, currentTheme, timeFormat } = useAppStore();
   const C = THEMES[currentTheme].colors;
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await useAppStore.getState().loadPersistedState();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
@@ -303,7 +315,18 @@ export default function ReplayScreen() {
           </Text>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={C.primary}
+              colors={[C.primary]}
+            />
+          }
+        >
           <WaveformPanel themeId={currentTheme} />
           <Text style={{
             fontSize: 10, letterSpacing: 2.5, color: C.textDim,
