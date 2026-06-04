@@ -1,4 +1,4 @@
-import { View, ScrollView, Text, Dimensions, RefreshControl } from 'react-native';
+import { View, ScrollView, Text, Dimensions, RefreshControl, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
@@ -306,16 +306,34 @@ export default function ReplayScreen() {
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 220 }}
       />
       <SafeAreaView style={{ flex: 1 }} edges={['top']}>
-        <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 }}>
-          <Text style={{ fontSize: 24, fontWeight: '700', color: C.textPrimary, letterSpacing: 2, marginBottom: 4 }}>
-            MEMORY STREAM
-          </Text>
-          <Text style={{ fontSize: 11, color: C.textDim }}>
-            Signal archive · Intercepted events · Score trace
-          </Text>
+        <View style={{
+          paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20,
+          flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start',
+        }}>
+          <View>
+            <Text style={{ fontSize: 24, fontWeight: '700', color: C.textPrimary, letterSpacing: 2, marginBottom: 4 }}>
+              MEMORY STREAM
+            </Text>
+            <Text style={{ fontSize: 11, color: C.textDim }}>
+              Signal archive · Intercepted events · Score trace
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={onRefresh}
+            activeOpacity={0.7}
+            style={{
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+            }}
+          >
+            <Text style={{ fontSize: 12, color: C.textDim, fontWeight: '600', letterSpacing: 0.5 }}>
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <ScrollView
+          style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 120 }}
           refreshControl={
