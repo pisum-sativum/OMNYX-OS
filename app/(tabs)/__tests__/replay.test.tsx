@@ -24,7 +24,7 @@ describe('MemoryNode', () => {
     const event = makeEvent(riskLevel);
 
     const { getByText } = render(
-      <MemoryNode event={event} index={0} isLast themeId="nebula" />,
+      <MemoryNode event={event} index={0} isLast themeId="nebula" timeFormat="12h" />,
     );
 
     // Risk badge text is the uppercased risk level.
