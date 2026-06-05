@@ -293,7 +293,6 @@ export default function ReplayScreen() {
     try {
       await useAppStore.getState().loadPersistedState();
     } catch (error) {
-      console.error(error);
     } finally {
       setRefreshing(false);
     }
