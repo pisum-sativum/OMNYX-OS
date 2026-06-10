@@ -1,4 +1,4 @@
-import { buildThreatEvents } from '../privacyIntelligence';
+import { buildThreatEvents, computePrivacyScore } from '../privacyIntelligence';
 import type {
   AppRiskProfile,
   ScanResult,
@@ -132,5 +132,85 @@ describe('buildThreatEvents', () => {
 
     expect(events.length).toBeGreaterThan(0);
     expect(events.every(e => e.resolved === false)).toBe(true);
+  });
+});
+
+// ── computePrivacyScore ───────────────────────────────────────────────────────
+
+describe('computePrivacyScore', () => {
+  it('returns a score close to 100 for a clean device with no dangerous permissions', () => {
+    const cleanDevice = makeScanResult([
+      makeProfile({ packageName: 'com.example.a', riskTier: 'safe', permissions: [] }),
+      makeProfile({ packageName: 'com.example.b', riskTier: 'safe', permissions: [] }),
+    ]);
+
+    const result = computePrivacyScore(cleanDevice, 100);
+
+    expect(result.current).toBeGreaterThanOrEqual(95);
+    expect(result.breakdown.permissions).toBe(100);
+    expect(result.breakdown.trackers).toBe(100);
+  });
+
+  it('returns a lower score for a device with many high-risk apps than for a clean device', () => {
+    const cleanScore = computePrivacyScore(
+      makeScanResult([makeProfile({ riskTier: 'safe', permissions: [] })]),
+      50,
+    ).current;
+
+    const riskyDevice = makeScanResult([
+      makeProfile({ packageName: 'com.risk.1', riskTier: 'critical', permissions: [] }),
+      makeProfile({ packageName: 'com.risk.2', riskTier: 'critical', permissions: [] }),
+      makeProfile({ packageName: 'com.risk.3', riskTier: 'critical', permissions: [] }),
+      makeProfile({ packageName: 'com.risk.4', riskTier: 'high', permissions: [] }),
+      makeProfile({ packageName: 'com.risk.5', riskTier: 'high', permissions: [] }),
+    ]);
+    const riskyScore = computePrivacyScore(riskyDevice, 50).current;
+
+    expect(riskyScore).toBeLessThan(cleanScore);
+  });
+
+  it('keeps the score within 0-100 for clean, extreme, and empty inputs', () => {
+    const inputs: ScanResult[] = [
+      makeScanResult([]), // no apps at all
+      makeScanResult([makeProfile({ riskTier: 'safe', permissions: [] })]),
+      makeScanResult(
+        // 50 critical apps — push penalties to their caps
+        Array.from({ length: 50 }, (_, i) =>
+          makeProfile({ packageName: `com.flood.${i}`, riskTier: 'critical', permissions: [] }),
+        ),
+      ),
+    ];
+
+    for (const scan of inputs) {
+      for (const previous of [0, 50, 100, -999, 9999]) {
+        const { current } = computePrivacyScore(scan, previous);
+        expect(current).toBeGreaterThanOrEqual(0);
+        expect(current).toBeLessThanOrEqual(100);
+      }
+    }
+  });
+
+  it("reports 'improving' when the current score rises above the previous one", () => {
+    // A clean device scores ~100; against a lower previous score the trend improves.
+    const cleanDevice = makeScanResult([makeProfile({ riskTier: 'safe', permissions: [] })]);
+
+    const result = computePrivacyScore(cleanDevice, 40);
+
+    expect(result.current).toBeGreaterThan(result.previous + 2);
+    expect(result.trend).toBe('improving');
+  });
+
+  it("reports 'declining' when the current score falls below the previous one", () => {
+    // A heavily compromised device scores low; against a high previous score it declines.
+    const riskyDevice = makeScanResult(
+      Array.from({ length: 5 }, (_, i) =>
+        makeProfile({ packageName: `com.risk.${i}`, riskTier: 'critical', permissions: [] }),
+      ),
+    );
+
+    const result = computePrivacyScore(riskyDevice, 100);
+
+    expect(result.current).toBeLessThan(result.previous - 2);
+    expect(result.trend).toBe('declining');
   });
 });
