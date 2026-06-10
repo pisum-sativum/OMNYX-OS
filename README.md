@@ -139,7 +139,8 @@ omnyx/
      validators/          Zod input/output schemas
      security/            Prompt sanitization, content filtering
 ```
-
+See full system architecture with diagrams:  
+[View Architecture Docs](docs/architecture.md)
 ### Data Flow
 
 ```
