@@ -461,8 +461,10 @@ function AppRiskCard({
                     }
                     activeOpacity={0.75}
                     style={{
-                      paddingHorizontal: 6,
-                      paddingVertical: 2,
+                      paddingHorizontal: 10,
+                      paddingVertical: 8,
+                      minHeight: 36,
+                      justifyContent: 'center',
                       borderRadius: 5,
                       backgroundColor: isOpen ? `${riskColor}28` : `${C.borderDim}80`,
                       borderWidth: 1,
