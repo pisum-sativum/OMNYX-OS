@@ -23,58 +23,96 @@ const DEFAULT_PRIVACY_SCORE: PrivacyScoreData = {
 };
 
 interface AppState {
+  /** The active visual theme configuration used to style the UI. */
   currentTheme: ThemeId;
+  /** Updates the visual theme configuration across all screens. */
   setTheme: (theme: ThemeId) => void;
 
+  /** Current privacy score data including trend direction and category breakdown. */
   privacyScore: PrivacyScoreData;
+  /** Modifies selected fields within the privacy score metadata. */
   updatePrivacyScore: (score: Partial<PrivacyScoreData>) => void;
 
+  /** The active device security profile which alters sensor scanning sensitivity. */
   privacyMode: PrivacyMode;
+  /** Updates the active security profile mode. */
   setPrivacyMode: (mode: PrivacyMode) => void;
 
+  /** The preference specifying how time should be rendered in event lists. */
   timeFormat: '12h' | '24h';
+  /** Sets the user's preferred time layout option. */
   setTimeFormat: (format: '12h' | '24h') => void;
 
+  /** The listing of intercepted high-risk activities and alert entries. */
   threatEvents: ThreatEvent[];
+  /** Appends a new potential risk event to the threat log and marks it unread. */
   addThreatEvent: (event: ThreatEvent) => void;
+  /** Marks a specific flagged threat as resolved/addressed. */
   resolveThreat: (id: string) => void;
+  /** Marks all active threats in the list as resolved and clears the unread count. */
   resolveAllThreats: () => void;
+  /** The number of active alert items that have not yet been cleared or reviewed. */
   unreadThreatCount: number;
+  /** Resets the badge count for new alerts to zero. */
   clearUnreadThreats: () => void;
 
+  /** The registered AI swarm components and their online status parameters. */
   agents: AIAgent[];
+  /** Modifies properties for a specific AI agent node in the swarm. */
   updateAgent: (id: string, updates: Partial<AIAgent>) => void;
 
+  /** The catalog of installed applications examined during privacy audits. */
   scannedApps: ScannedApp[];
+  /** Replaces the collection of applications flagged for audit. */
   setScannedApps: (apps: ScannedApp[]) => void;
 
+  /** Historical record of system scans, alerts, and user decisions. */
   replayEvents: ReplayEvent[];
+  /** Pushes a new historical scan or alert transaction into the replay queue. */
   addReplayEvent: (event: ReplayEvent) => void;
 
   // ── Phase 3: Permission scanner state ──────────────────────────────────────
+  /** Indicates whether a background privacy inspection is currently running. */
   isScanning: boolean;
+  /** Controls the visual and logical state representing an ongoing scan. */
   setIsScanning: (scanning: boolean) => void;
+  /** Percentage completion value of the active privacy sweep. */
   scanProgress: number;
+  /** Updates the numerical completion ratio for the current inspection scan. */
   setScanProgress: (progress: number) => void;
+  /** Text description representing the current category being inspected in the scan. */
   scanPhase: string;
+  /** Updates the descriptive text representing the current category being inspected. */
   setScanPhase: (phase: string) => void;
+  /** The cumulative data payload returned from the most recent full scan. */
   scanResult: ScanResult | null;
+  /** Triggers a full device scan and populates scanResult with real permission data. */
   setScanResult: (result: ScanResult | null) => void;
 
   // ── Phase 4: Realtime intelligence state ───────────────────────────────────
+  /** The aesthetic danger rating calculated from unresolved threat levels. */
   atmosphereLevel: AtmosphereLevel;
+  /** Visual vibration or pulse speed scalar corresponding to system alert levels. */
   atmosphereIntensity: number;
+  /** Configures both the threat atmospheric level and visual speed modifier. */
   setAtmosphere: (level: AtmosphereLevel, intensity: number) => void;
+  /** A sliding window of live intercepted signals and alerts. */
   recentEvents: OmnyxEvent[];
+  /** Appends a live telemetry event to the recent signals buffer. */
   addRealtimeEvent: (event: OmnyxEvent) => void;
+  /** Specifies whether the live event stream listener is currently active. */
   realtimeConnected: boolean;
+  /** Connects or disconnects the live telemetry socket emulation. */
   setRealtimeConnected: (connected: boolean) => void;
 
   // ── Phase 5: AI analysis cache ─────────────────────────────────────────────
+  /** Stored evaluation analysis results received from LLM agents to prevent duplicate calls. */
   aiCache: Record<string, AIAnalysisResult>;
+  /** Associates a threat item with its verified AI-generated analysis result. */
   setAICache: (id: string, result: AIAnalysisResult) => void;
 
   // ── Persistence ────────────────────────────────────────────────────────────
+  /** Restores previously saved scan, score, and threat history from local disk storage. */
   loadPersistedState: () => Promise<void>;
 }
 
