@@ -12,6 +12,7 @@ import {
 } from '@services/mockData';
 import { computePrivacyScore, buildThreatEvents, buildScanOmnyxEvents, buildReplayEvents } from '@services/privacyIntelligence';
 import { loadScanState, saveScanState } from '@services/scanPersistence';
+import * as Haptics from 'expo-haptics';
 
 const MAX_RECENT_EVENTS = 50;
 
@@ -131,25 +132,33 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set, get) =
   setTimeFormat: (format) => set({ timeFormat: format }),
 
   threatEvents: [],
-  addThreatEvent: (event) =>
+  addThreatEvent: (event) => {
+    if (event.riskLevel === 'critical') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } else if (event.riskLevel === 'high') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
     set((state) => ({
       threatEvents: [event, ...state.threatEvents],
       unreadThreatCount: state.unreadThreatCount + 1,
-    })),
+    }));
+  },
+
   resolveThreat: (id) =>
     set((state) => ({
       threatEvents: state.threatEvents.map((e) =>
         e.id === id ? { ...e, resolved: true } : e
       ),
     })),
+
   resolveAllThreats: () =>
-  set((state) => ({
-    threatEvents: state.threatEvents.map((event) => ({
-      ...event,
-      resolved: true,
+    set((state) => ({
+      threatEvents: state.threatEvents.map((event) => ({
+        ...event,
+        resolved: true,
+      })),
+      unreadThreatCount: 0,
     })),
-    unreadThreatCount: 0,
-  })),
   unreadThreatCount: 0,
   clearUnreadThreats: () => set({ unreadThreatCount: 0 }),
 
@@ -195,7 +204,6 @@ export const useAppStore = create<AppState>()(subscribeWithSelector((set, get) =
     for (const event of omnyxEvents) {
       get().addRealtimeEvent(event);
     }
-
     saveScanState(result, threatEvents, privacyScore.current).catch(() => {});
   },
 
