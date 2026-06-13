@@ -13,6 +13,7 @@ import { Share } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
+  useAnimatedProps,
   withRepeat,
   withTiming,
   withSequence,
@@ -20,6 +21,7 @@ import Animated, {
   cancelAnimation,
   FadeIn,
   FadeInDown,
+  Easing,
 } from 'react-native-reanimated';
 import { useState, useEffect, useRef } from 'react';
 import Svg, {
@@ -32,6 +34,8 @@ import Svg, {
   Rect,
   Pattern,
 } from 'react-native-svg';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 import {
   ChevronDown,
   AlertTriangle,
@@ -506,7 +510,25 @@ function ScoreRing({ score, themeId }: { score: number; themeId: ThemeId }) {
   const glowId = `glow_${themeId}`;
   const ringId = `ring_${themeId}`;
 
+  const progress = useSharedValue(0);
 
+  useEffect(() => {
+    progress.value = withTiming(1, {
+      duration: 1200,
+      easing: Easing.out(Easing.ease),
+    });
+    return () => {
+      cancelAnimation(progress);
+    };
+  }, []);
+
+  const animatedProps = useAnimatedProps(() => {
+    const currentDash = progress.value * strokeDash;
+    const offset = CIRCUMFERENCE / 4 + CIRCUMFERENCE - currentDash;
+    return {
+      strokeDashoffset: offset,
+    };
+  }, [CIRCUMFERENCE, strokeDash]);
 
   const onShareScore = async () => {
     try {
@@ -554,13 +576,13 @@ function ScoreRing({ score, themeId }: { score: number; themeId: ThemeId }) {
         </Defs>
         <Circle cx={CENTER} cy={CENTER} r={RING_RADIUS + extraGlow} fill={`url(#${glowId})`} />
         <Circle cx={CENTER} cy={CENTER} r={RING_RADIUS} fill="none" stroke={C.ringTrack} strokeWidth={RING_STROKE} />
-        <Circle
+        <AnimatedCircle
           cx={CENTER} cy={CENTER} r={RING_RADIUS}
           fill="none"
           stroke={`url(#${ringId})`}
           strokeWidth={RING_STROKE + (themeId === 'nebula' ? 2 : 1)}
-          strokeDasharray={`${strokeDash} ${strokeGap}`}
-          strokeDashoffset={CIRCUMFERENCE / 4}
+          strokeDasharray={`${CIRCUMFERENCE} ${CIRCUMFERENCE}`}
+          animatedProps={animatedProps}
           strokeLinecap="round"
         />
         {themeId === 'terminal' && (

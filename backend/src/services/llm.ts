@@ -3,7 +3,7 @@ import { callOpenAI } from '../ai/openai';
 import { sanitizeThreatData } from '../security/sanitize';
 import type { AnalyzeRequest, AIAnalysisResult } from '../validators/aiSchemas';
 
-export async function analyzeThreaat(request: AnalyzeRequest): Promise<AIAnalysisResult> {
+export async function analyzeThreat(request: AnalyzeRequest): Promise<AIAnalysisResult> {
   const sanitized = sanitizeThreatData({
     appName: request.threatData.appName,
     description: request.threatData.description,

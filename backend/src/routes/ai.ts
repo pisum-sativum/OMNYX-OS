@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { AnalyzeRequestSchema } from '../validators/aiSchemas';
 import { rateLimitMiddleware } from '../middleware/rateLimit';
 import { validateMiddleware } from '../middleware/validate';
-import { analyzeThreaat } from '../services/llm';
+import { analyzeThreat } from '../services/llm';
 import { randomUUID } from 'crypto';
 
 export async function aiRoutes(fastify: FastifyInstance) {
@@ -27,7 +27,7 @@ export async function aiRoutes(fastify: FastifyInstance) {
     if (reply.sent) return;
 
     try {
-      const analysis = await analyzeThreaat(validatedBody);
+      const analysis = await analyzeThreat(validatedBody);
       return reply.send({
         success: true,
         data: analysis,
